@@ -1,5 +1,7 @@
 #!/bin/sh -e
 
+DEFAULT_IMAGE_SIZES="900MB 1900MB 3900MB 7900MB"
+
 if [ $# -gt 0 ]; then
 	echo "usage: ./create-image"
 	echo
@@ -10,7 +12,8 @@ if [ $# -gt 0 ]; then
 	echo "EV3DEV_MIRROR    URL for ev3dev package repository"
 	echo "                 default: http://ppa.lechnology.com/ev3dev"
 	echo "IMAGE_SIZE       Size(s) of image files to create"
-	echo "                 default: 1G 2G 4G 8G"
+	echo "                 default: $DEFAULT_IMAGE_SIZES"
+	echo "                 see *man truncate* for allowable units"
 	exit 0
 fi
 
@@ -18,7 +21,7 @@ if [ ! -z $DEBIAN_MIRROR ]; then
 	DEBIAN_MIRROR="-m $DEBIAN_MIRROR"
 fi
 if [ -z $IMAGE_SIZE ]; then
-	IMAGE_SIZE="1G 2G 4G 8G"
+	IMAGE_SIZE=$DEFAULT_IMAGE_SIZES
 fi
 
 polystrap -d ev3dev-rootfs $DEBIAN_MIRROR ev3dev
