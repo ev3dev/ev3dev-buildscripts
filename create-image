@@ -29,6 +29,7 @@ polystrap -d ev3dev-rootfs $DEBIAN_MIRROR ev3dev
 # guestfish does not know how to set label for vfat!
 
 guestfish -N bootroot:vfat:ext3:512M:48M:mbr \
+part-set-mbr-id /dev/sda 1 0x0b : \
 set-label /dev/sda2 EV3_FILESYS : \
 mount /dev/sda2 / : \
 tar-in ev3dev-rootfs.tar.gz / compress:gzip : \
