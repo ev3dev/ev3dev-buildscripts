@@ -24,7 +24,7 @@ if [ -z $IMAGE_SIZE ]; then
 	IMAGE_SIZE=$DEFAULT_IMAGE_SIZES
 fi
 
-polystrap -d ev3dev-rootfs $DEBIAN_MIRROR ev3dev
+polystrap -f -d ev3dev-rootfs $DEBIAN_MIRROR ev3dev
 
 # guestfish does not know how to set label for vfat!
 
