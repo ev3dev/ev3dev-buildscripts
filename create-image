@@ -1,8 +1,6 @@
 #!/bin/sh -e
 
-DEFAULT_IMAGE_SIZES="900MB 1900MB 3900MB 7900MB"
-
-if [ $# -gt 0 ]; then
+function usage() {
 	echo "usage: ./create-image"
 	echo
 	echo "ENVIRONMENT VARIABLES"
@@ -11,27 +9,40 @@ if [ $# -gt 0 ]; then
 	echo "                 default: http://ftp.debian.org/debian"
 	echo "EV3DEV_MIRROR    URL for ev3dev package repository"
 	echo "                 default: http://ppa.lechnology.com/ev3dev"
-	echo "IMAGE_SIZE       Size(s) of image files to create"
-	echo "                 default: $DEFAULT_IMAGE_SIZES"
-	echo "                 see *man truncate* for allowable units"
 	exit 0
-fi
+}
 
 if [ ! -z $DEBIAN_MIRROR ]; then
 	DEBIAN_MIRROR="-m $DEBIAN_MIRROR"
 fi
-if [ -z $IMAGE_SIZE ]; then
-	IMAGE_SIZE=$DEFAULT_IMAGE_SIZES
-fi
 
-polystrap -f -d ev3dev-rootfs $DEBIAN_MIRROR ev3dev
+while [[ $# > 0 ]]; do
+	opt="$1"
+	shift
+
+	case $opt in
+	-f|--force)
+		force=1
+		;;
+	-h|-?|--help)
+		usage
+		exit 0
+		;;
+	*)
+		;;
+	esac
+done
+
+if [ force || ! -d ev3dev-rootfs ]; then
+    polystrap -f -d ev3dev-rootfs $DEBIAN_MIRROR ev3dev
+fi
 
 # guestfish does not know how to set label for vfat!
 
-guestfish -N bootroot:vfat:ext3:512M:48M:mbr \
+guestfish -N bootrootlv:/dev/vg0/lv0:vfat:ext3:500M:48M:mbr \
 part-set-mbr-id /dev/sda 1 0x0b : \
-set-label /dev/sda2 EV3_FILESYS : \
-mount /dev/sda2 / : \
+set-label /dev/vg0/lv0 EV3_FILESYS : \
+mount /dev/vg0/lv0 / : \
 tar-in ev3dev-rootfs.tar.gz / compress:gzip : \
 mkdir-p /media/mmc_p1 : \
 mount /dev/sda1 /media/mmc_p1 : \
@@ -44,12 +55,6 @@ mv /ev3dev.rc.local /media/mmc_p1/
 # volume name must be null padded to exactly 11 bytes
 echo -e "EV3_BOOT\0\0\0" | dd of=test1.img bs=1 seek=32811 count=11 conv=notrunc
 
-for size in $IMAGE_SIZE
-do
-	truncate -r test1.img ev3dev.$size.img
-	truncate -s $size ev3dev.$size.img
-	virt-resize --expand /dev/sda2 test1.img ev3dev.$size.img
-	zip -9 ev3dev.$size.img.zip ev3dev.$size.img
-	cat ev3dev.$size.img | xz -9 > ev3dev.$size.img.xz
-	rm -f ev3dev.$size.img
-done
+mv test1.img ev3dev.img
+zip -9 ev3dev.img.zip ev3dev.img
+cat ev3dev.img | xz -9 > ev3dev.img.xz
