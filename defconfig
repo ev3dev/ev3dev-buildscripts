@@ -4,10 +4,10 @@
 # ------------------------------------------------------------------------------
 
 . ./setup-env
-kernel_src_path="$AM1808_KERNEL"
-obj_path="$AM1808_OBJ"
-make_args="$AM1808_MAKE_ARGS -C ${kernel_src_path} KBUILD_OUTPUT=${obj_path} \
-ARCH=arm CROSS_COMPILE=$AM1808_COMPILER/$AM1808_ABI"
+kernel_src_path="$EV3DEV_KERNEL"
+obj_path="$EV3DEV_OBJ"
+make_args="$EV3DEV_MAKE_ARGS -C ${kernel_src_path} KBUILD_OUTPUT=${obj_path} \
+ARCH=arm CROSS_COMPILE=$EV3DEV_TOOLCHAIN/$EV3DEV_ABI"
 
 show_usage ()
 {
@@ -90,7 +90,7 @@ case "$1" in
 	update)
 		check_for_local_config
 		make ${make_args} savedefconfig || exit $?
-		if [ "$2" == "-i" ]
+		if [ "$2" = "-i" ]
 		then
 			export file1=${obj_path}/defconfig
 			export file2=${kernel_src_path}/arch/arm/configs/ev3dev_defconfig

@@ -13,46 +13,42 @@
 #
 # . ./setup-env
 #
-# Note that the variables prefixed with LEGO_ are only there to make it 
-# easier to switch to building the stock LEGO image, which I did at the 
-# beginning to verify the compiler toolchain.
-#
-# The variables prefixed with EV3DEV_ are the ones we'll use for building
-# the ev3dev distribution.
-#
-# And finally, the AM1808_ prefixed variables are the ones the build
-# scripts use to get to the source and executables. These are the ones
-# that you should override in your local files.
-#
 # ------------------------------------------------------------------------------
 
 
-export AM1808_COMPILER="../bin/arm-2011.03/bin"
+# Where to find the Code Sourcery toolchain
+# This is where it is installed if you used the code-sourcery-toolchain-arm-2011.03
+# package from the ev3dev.org package repository
+export EV3DEV_TOOLCHAIN="/opt/arm-2011.03/bin"
 
-export LEGO_AM1808_DISTRO="lego-DaVinci-PSP-SDK-03.20.00.13"
-export LEGO_AM1808_LINUX="linux-03.20.00.13"
-export LEGO_AM1808_UBOOT="uboot-03.20.00.13"
-export LEGO_AM1808_ABI="arm-none-eabi-"
+# This is the abi used to cross-compile using the Code Sourcery toolchain
+export EV3DEV_ABI="arm-none-eabi-"
 
-export LEGO_AM1808_KERNEL="/opt/${LEGO_AM1808_DISTRO}/src/kernel/${LEGO_AM1808_LINUX}"
+# This is the name of the ev3dev linux kernel git repository
+export EV3DEV_LINUX="ev3dev-kernel"
 
-export EV3DEV_AM1808_DISTRO=".."
-export EV3DEV_AM1808_LINUX="ev3dev-kernel"
-export EV3DEV_AM1808_ABI="arm-none-eabi-"
+# This is where the scripts put all of generated files
+export EV3DEV_BUILD_AREA=".."
 
-export AM1808_DISTRO="${EV3DEV_AM1808_DISTRO}"
-export AM1808_LINUX="${EV3DEV_AM1808_LINUX}"
-export AM1808_ABI="${EV3DEV_AM1808_ABI}"
-export AM1808_OBJ="${AM1808_DISTRO}/obj"
-export AM1808_KERNEL="${AM1808_DISTRO}/${AM1808_LINUX}"
-export AM1808_INSTALL="${AM1808_DISTRO}/dist"
+# This is shere the ev3dev linux kernel git repository is checked out
+export EV3DEV_KERNEL="${EV3DEV_BUILD_AREA}/${EV3DEV_LINUX}"
+
+# This is the directory where the kernel will be built
+export EV3DEV_OBJ="${EV3DEV_BUILD_AREA}/obj"
+
+# This is where the kernel uImage will be installed after the kernel is built
+export EV3DEV_INSTALL_KERNEL="${EV3DEV_BUILD_AREA}/dist"
+
+# This is where the kernel modules will be installed after the kernel is built
+export EV3DEV_INSTALL_MODULES="${EV3DEV_BUILD_AREA}/dist"
+
+# This is the command that the defconfig script uses to merge files
 export EV3DEV_MERGE_CMD="vimdiff \$file1 \$file2"
 
-#export AM1808_MODULES=~/projects/lms2012/lms2012/Linux_AM1808/sys/mod
+# This is the network host name/address of your EV3 brick
+export EV3DEV_NET_ADDR="ev3dev"
 
-#export X86_KERNEL=/lib/modules/$(uname -r)/build
-#export X86_MODULES=~/projects/lms2012/lms2012/Linux_X86/sys/mod
-
+# This is how you override these values (by creating one of these files)
 if [ -f ~/.ev3dev-env ]
 then
 	. ~/.ev3dev-env
