@@ -14,4 +14,4 @@ rm ${download_file}
 
 # ------------------------------------------------------------------------------
 # Install required packages
-sudo apt-get --no-install-recommends install build-essential ncurses-dev uboot-mkimage libc6-i386
+sudo apt-get --no-install-recommends install build-essential ncurses-dev uboot-mkimage libc6-i386 fakeroot
