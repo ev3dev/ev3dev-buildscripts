@@ -2,10 +2,10 @@
 
 . ./setup-env
 
-if [ ! -f $AM1808_INSTALL ]
+if [ ! -f $EV3DEV_INSTALL ]
 then
-        mkdir -p $AM1808_INSTALL || exit $?
+        mkdir -p $EV3DEV_INSTALL || exit $?
 fi
 
-mkimage -A arm -O linux -T script -C none -a 0 -e 0 -n "ev3dev" -d boot.cmd $AM1808_INSTALL/boot.scr
+mkimage -A arm -O linux -T script -C none -a 0 -e 0 -n "ev3dev" -d boot.cmd $EV3DEV_INSTALL/boot.scr
 

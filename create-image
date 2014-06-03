@@ -1,4 +1,4 @@
-#!/bin/sh -e
+#!/bin/bash -e
 
 function usage() {
 	echo "usage: ./create-image"
@@ -33,8 +33,8 @@ while [[ $# > 0 ]]; do
 	esac
 done
 
-if [ force || ! -d ev3dev-rootfs ]; then
-    polystrap -f -d ev3dev-rootfs $DEBIAN_MIRROR ev3dev
+if [[ $force || ! -d ev3dev-rootfs ]]; then
+    ~/work/brickstrap/brickstrap.sh -f -d ev3dev-rootfs $DEBIAN_MIRROR ev3dev
 fi
 
 # guestfish does not know how to set label for vfat!
@@ -56,5 +56,5 @@ mv /ev3dev.rc.local /media/mmc_p1/
 echo -e "EV3_BOOT\0\0\0" | dd of=test1.img bs=1 seek=32811 count=11 conv=notrunc
 
 mv test1.img ev3dev.img
-zip -9 ev3dev.img.zip ev3dev.img
-cat ev3dev.img | xz -9 > ev3dev.img.xz
+#zip -9 ev3dev.img.zip ev3dev.img
+#cat ev3dev.img | xz -9 > ev3dev.img.xz

@@ -9,45 +9,54 @@ echo BUILDING KERNEL
 echo -------------------------------------------------------------------------------
 echo
 
+set -e
+
 . ./setup-env
 
-kernel_src_path="$AM1808_KERNEL"
-obj_path="$AM1808_OBJ"
-install_path="$AM1808_INSTALL"
-make_args="$AM1808_MAKE_ARGS -C ${kernel_src_path} KBUILD_OUTPUT=${obj_path} \
-ARCH=arm CROSS_COMPILE=$AM1808_COMPILER/$AM1808_ABI"
+kernel_src_path="$EV3DEV_KERNEL"
+obj_path="$EV3DEV_OBJ"
+kernel_install_path="$EV3DEV_INSTALL_KERNEL"
+modules_install_path="$EV3DEV_INSTALL_MODULES"
+make_args="$EV3DEV_MAKE_ARGS -C ${kernel_src_path} KBUILD_OUTPUT=${obj_path} \
+ARCH=arm CROSS_COMPILE=$EV3DEV_TOOLCHAIN/$EV3DEV_ABI"
 
 if [ ! -d "${obj_path}" ]
 then
 	echo "CREATING OBJ DIRECTORY"
-	mkdir -p "${obj_path}" || exit $?
+	mkdir -p "${obj_path}"
 fi
 
 if [ ! -f "${obj_path}/.config" ]
 then
 	echo "LOADING DEFAULT KERNEL CONFIGURATION"
-	make ${make_args} defconfig KBUILD_DEFCONFIG=ev3dev_defconfig || exit $?
+	make ${make_args} defconfig KBUILD_DEFCONFIG=ev3dev_defconfig
 fi
 
 if [ $# -eq 0 ]
 then
 	echo "CROSS COMPILING KERNEL"
-	make ${make_args} uImage  modules|| exit $?
+	make ${make_args} uImage  modules
 
-	if [ ! -d "${install_path}" ]
+	if [ ! -d "${kernel_install_path}" ]
 	then
-		echo "CREATING OUTPUT DIRECTORY"
-		mkdir -p "${install_path}" || exit $?
+		echo "CREATING KERNEL INSTALL DIRECTORY"
+		mkdir -p "${kernel_install_path}"
 	fi
 
-	echo "COPYING BOOTABLE IMAGE TO LOCAL DIRECTORY"
-	cp ${obj_path}/arch/arm/boot/uImage ${install_path} || exit $?
+	if [ ! -d "${modules_install_path}" ]
+	then
+		echo "CREATING MODULE INSTALL DIRECTORY"
+		mkdir -p "${modules_install_path}"
+	fi
 
-	echo "COPYING MODULES TO LOCAL DIRECTORY"
-	make ${make_args} modules_install INSTALL_MOD_PATH=${install_path}/ || exit $?
+	echo "COPYING BOOTABLE IMAGE TO INSTALL DIRECTORY"
+	cp ${obj_path}/arch/arm/boot/uImage ${kernel_install_path}
+
+	echo "COPYING MODULES TO INSTALL DIRECTORY"
+	make ${make_args} modules_install INSTALL_MOD_PATH=${modules_install_path}/
 else
 	echo "CROSS COMPILING KERNEL"
-	make ${make_args} $@ || exit $?
+	make ${make_args} $@
 
 	for arg in "$@"
 	do
