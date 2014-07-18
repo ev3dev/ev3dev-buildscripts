@@ -1,13 +1,13 @@
-If you just want to use ev3dev, please see the
-[main ev3dev repository](https://github.com/mindboards/ev3dev).
+If you just want to use ev3dev, please see the [main ev3dev repository][1].
 
 If you want to build the ev3dev kernel or root file system, read on.
 
 ev3dev-rootfs
 =============
 
-These are the scripts used to compile the ev3dev kernel and build the root
-file system.
+These are the scripts used to compile the ev3dev kernel. Originally it also
+included scripts to bootstrap a root file system and create a disk image.
+Those scripts have evolved into the [brickstrap][2] package.
 
 
 System Requirements
@@ -46,8 +46,8 @@ First time kernel build
 
 3.  Clone the kernel and root file system repos.
 
-        ~/work $ git clone git://github.com/mindboards/ev3dev-kernel
-        ~/work $ git clone git://github.com/mindboards/ev3dev-rootfs
+        ~/work $ git clone git://github.com/ev3dev/ev3dev-kernel
+        ~/work $ git clone git://github.com/ev3dev/ev3dev-buildscripts
 
 4.  Change to the `ev3dev-rootfs` director and have a look around.
 
@@ -110,6 +110,16 @@ The `-j4` is for faster builds. It allows make to compile files in
 in parallel. You should replace 4 with the number of processor cores that
 you want to devote to building the kernel.
 
+You can use custom paths to make the `build-kernel` script automatically
+install the kernel and modules directly on the EV3! First, you need to
+mount the EV3 root file system. You can use nfs or sshfs (check the
+[wiki][3] on how to do this). Then just set the appropriate paths in your
+`local-env` like this:
+
+    # replace `/mnt/ev3dev-root` with your actual mount point
+    export EV3DEV_INSTALL_KERNEL=/mnt/ev3dev-root/media/mmc_p1
+    export EV3DEV_INSTALL_MODULES=/mnt/ev3dev-root
+
 
 Managing the Kernel Configuration
 ---------------------------------
@@ -146,43 +156,30 @@ Sharing Your Kernel
 Want to send your custom kernel to someone so that they can use it? Never fear,
 there is an easy way to do that - using Debian packaging.
 
-First, we need to change a couple kernel options to add some version info so
-that our friends will know what kernel they are running. Run `./menuconfig`
-and set the following options:
+First, we want to set a kernel option so that our friends will know what kernel
+they are running. Run `./menuconfig` and set this option:
 
     General setup --->
       (-your-name) Local version - append to kernel release
-      [*] Automatically append version information to the version string
 
 Make sure to include the '-' prefix in `-your-name` on the _Local version_.
 And, of course, substitute something like your github user name for _your-name_.
-Also, I don't recommend leaving the second option enabled during regular
-development, otherwise every time you make a commit, you will have to reload the
-kernel on your EV3 even if you only made changes to modules.
 
-Now, make sure that your git repo is clean (or your kernel version will say
-_dirty_).
-
-    ~/work/ev3dev-kernel $ git status
-    # On branch awesomeness
-    nothing to commit, working directory clean
-
-Then, we build a Debian package (with a crazy huge file name).
+Then, we build a Debian package.
 
     ~/work/ev3dev-rootfs $ ./build-kernel deb-pkg KDEB_PACKAGEVERSION=1
     ...
     <lots-of-build-output>
     ...
     ~/work/ev3dev-rootfs $ ls ../*.deb
-    ../linux-headers-3.3.0-ev3dev-00.01.02-your-name-g04254fb_1_armel.deb
-    ../linux-image-3.3.0-ev3dev-00.01.02-your-name-g04254fb_1_armel.deb
+    ../linux-headers-3.3.0-3-ev3dev-your-name_1_armel.deb
+    ../linux-image-3.3.0-3-ev3dev-your-name_1_armel.deb
     ../linux-libc-dev_1_armel.deb
 
 Now, send the `linux-image-i*` file to your friend with these instructions:
 
 * Copy the `.deb` file to your EV3
 * Install the package
-* Overwrite the existing uImage file on the FAT partition with the new one
 * Reboot the EV3
 
 Example:
@@ -190,7 +187,31 @@ Example:
     user@host ~ $ scp linux-image-*.deb root@ev3dev:/tmp
     user@host ~ $ ssh root@ev3dev
     root@ev3dev:~# dpkg --install /tmp/linux-image-*.deb
-    root@ev3dev:~# cp /boot/uImage-3.3.0-ev3dev-00.01.02-your-name-g04254fb /media/mmc_p1/uImage 
     root@ev3dev:~# reboot
 
+Common Errors
+-------------
 
+If you see an error related to `asm/bitsperlong.h` like this:
+
+    ...
+      Generating include/generated/mach-types.h
+      CC      kernel/bounds.s
+    In file included from /home/user/ev3dev-kernel/arch/arm/include/asm/types.h:4:0,
+                     from /home/user/ev3dev-kernel/include/linux/types.h:4,
+                     from /home/user/ev3dev-kernel/include/linux/page-flags.h:8,
+                     from /home/user/ev3dev-kernel/kernel/bounds.c:9:
+    /home/user/ev3dev-kernel/include/asm-generic/int-ll64.h:11:29: fatal error: asm/bitsperlong.h: No such file or directory
+    compilation terminated.
+    make[2]: *** [kernel/bounds.s] Error 1
+    make[1]: *** [prepare0] Error 2
+    make: *** [sub-make] Error 2
+
+Then you need to clean your kernel source tree like this:
+
+    user@host ~/ev3dev-kernel $ git clean -dfX
+
+
+[1]: https://github.com/mindboards/ev3dev
+[2]: https://github.com/ev3dev/brickstrap
+[3]: https://github.com/mindboards/ev3dev/wiki

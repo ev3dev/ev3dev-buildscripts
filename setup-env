@@ -30,7 +30,7 @@ export EV3DEV_LINUX="ev3dev-kernel"
 # This is where the scripts put all of generated files
 export EV3DEV_BUILD_AREA=".."
 
-# This is shere the ev3dev linux kernel git repository is checked out
+# This is where the ev3dev linux kernel git repository is checked out
 export EV3DEV_KERNEL="${EV3DEV_BUILD_AREA}/${EV3DEV_LINUX}"
 
 # This is the directory where the kernel will be built
