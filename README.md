@@ -53,14 +53,11 @@ First time kernel build
 
         ~/work $ cd ev3dev-rootfs
         ~/work/ev3dev-rootfs $ ls
-        build_ev3dev_setup          menuconfig         sdcard-img-mount
-        build_extras                multistrap.conf    sdcard-img-populate
-        build-kernel                README.md          update-defconfig
-        install-kernel-build-tools  rootfs-create
-        LICENSE                     sdcard-img-create
+        boot.cmd        build-kernel  install-kernel-build-tools  local-env   README.md
+        build-boot-scr  defconfig     LICENSE                     menuconfig  setup-env
 
 
-5.  Now we need to install the required tool. TO do this, just run the
+5.  Now we need to install the required tool. To do this, just run the
     `install-kernel-build-tools` script. (You only need to run this once.)
 
         ~/work/ev3dev-rootfs $ ./install-kernel-build-tools
@@ -79,7 +76,8 @@ First time kernel build
 
 8.  That's it! The uImage and kernel modules you just built are saved in
     `../dist`. You just need to copy the files to your
-    already formatted SD card.
+    already formatted SD card. For an easier way of getting the kernel on
+    your EV3, see [Sharing Your Kernel](#sharing-your-kernel).
 
         ~/work/ev3dev-rootfs $ cd ../dist
         ~/work/dist $ cp uImage <path-to-boot-partition>/uImage
