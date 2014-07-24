@@ -5,13 +5,5 @@
 # ------------------------------------------------------------------------------
 
 # ------------------------------------------------------------------------------
-# Download and extract the toolchain for cross-compiling.
-download_file=`tempfile`
-wget -O ${download_file} https://sourcery.mentor.com/public/gnu_toolchain/arm-none-eabi/arm-2011.03-42-arm-none-eabi-i686-pc-linux-gnu.tar.bz2
-mkdir -p ../bin
-tar -C ../bin -xjf ${download_file}
-rm ${download_file}
-
-# ------------------------------------------------------------------------------
 # Install required packages
-sudo apt-get --no-install-recommends install build-essential ncurses-dev uboot-mkimage libc6-i386 fakeroot
+sudo apt-get --no-install-recommends install build-essential ncurses-dev u-boot-tools libc6-i386 fakeroot bc code-sourcery-toolchain-arm-2011.03
