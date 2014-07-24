@@ -57,9 +57,13 @@ First time kernel build
         build-boot-scr  defconfig     LICENSE                     menuconfig  setup-env
 
 
-5.  Now we need to install the required tool. To do this, just run the
-    `install-kernel-build-tools` script. (You only need to run this once.)
+5.  Now we need to install the required tool. To do this, we need to add the
+    ev3dev package repo and then run the `install-kernel-build-tools` script.
+    (You only need to run this once.)
 
+        ~/work/ev3dev-rootfs $ .sudo apt-add-repository http://ev3dev.org/debian
+        ~/work/ev3dev-rootfs $ .sudo apt-key adv --keyserver pgp.mit.edu --recv-keys 2B210565
+        ~/work/ev3dev-rootfs $ .sudo apt-get update
         ~/work/ev3dev-rootfs $ ./install-kernel-build-tools
 
 6.  Create a `local-env` to make use of all of your processing power. See the
