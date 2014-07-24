@@ -194,24 +194,30 @@ Example:
 Common Errors
 -------------
 
-If you see an error related to `asm/bitsperlong.h` like this:
+* If you see this error...
 
-    ...
-      Generating include/generated/mach-types.h
-      CC      kernel/bounds.s
-    In file included from /home/user/ev3dev-kernel/arch/arm/include/asm/types.h:4:0,
-                     from /home/user/ev3dev-kernel/include/linux/types.h:4,
-                     from /home/user/ev3dev-kernel/include/linux/page-flags.h:8,
-                     from /home/user/ev3dev-kernel/kernel/bounds.c:9:
-    /home/user/ev3dev-kernel/include/asm-generic/int-ll64.h:11:29: fatal error: asm/bitsperlong.h: No such file or directory
-    compilation terminated.
-    make[2]: *** [kernel/bounds.s] Error 1
-    make[1]: *** [prepare0] Error 2
-    make: *** [sub-make] Error 2
+        ERROR: ld.so: object 'libfakeroot-sysv.so' from LD_PRELOAD cannot be preloaded (wrong ELF class: ELFCLASS64): ignored.
+    
+    ...just ignore it. It is normal (a side effect of cross-compiling).
 
-Then you need to clean your kernel source tree like this:
+* If you see an error related to `asm/bitsperlong.h` like this:
 
-    user@host ~/ev3dev-kernel $ git clean -dfX
+        ...
+          Generating include/generated/mach-types.h
+          CC      kernel/bounds.s
+        In file included from /home/user/ev3dev-kernel/arch/arm/include/asm/types.h:4:0,
+                          from /home/user/ev3dev-kernel/include/linux/types.h:4,
+                         from /home/user/ev3dev-kernel/include/linux/page-flags.h:8,
+                         from /home/user/ev3dev-kernel/kernel/bounds.c:9:
+        /home/user/ev3dev-kernel/include/asm-generic/int-ll64.h:11:29: fatal error: asm/bitsperlong.h: No such file or directory
+        compilation terminated.
+        make[2]: *** [kernel/bounds.s] Error 1
+        make[1]: *** [prepare0] Error 2
+        make: *** [sub-make] Error 2
+
+    Then you need to clean your kernel source tree like this:
+
+         user@host ~/ev3dev-kernel $ git clean -dfX
 
 
 [1]: https://github.com/mindboards/ev3dev
