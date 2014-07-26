@@ -1,19 +1,15 @@
-If you just want to use ev3dev, please see the [main ev3dev repository][1].
-
-If you want to build the ev3dev kernel or root file system, read on.
-
-ev3dev-rootfs
-=============
+ev3dev-buildscripts
+===================
 
 These are the scripts used to compile the ev3dev kernel. Originally it also
 included scripts to bootstrap a root file system and create a disk image.
-Those scripts have evolved into the [brickstrap][2] package.
+Those scripts have evolved into the [brickstrap] package.
 
 
 System Requirements
 -------------------
 * Debian or derivative OS (Ubuntu, Mint, etc.)
-* User account with ```sudo``` enabled
+* User account with `sudo` enabled
 
 Scripts
 -------
@@ -115,7 +111,7 @@ you want to devote to building the kernel.
 You can use custom paths to make the `build-kernel` script automatically
 install the kernel and modules directly on the EV3! First, you need to
 mount the EV3 root file system. You can use nfs or sshfs (check the
-[wiki][3] on how to do this). Then just set the appropriate paths in your
+[wiki] on how to do this). Then just set the appropriate paths in your
 `local-env` like this:
 
     # replace `/mnt/ev3dev-root` with your actual mount point
@@ -169,7 +165,7 @@ And, of course, substitute something like your github user name for _your-name_.
 
 Then, we build a Debian package.
 
-    ~/work/ev3dev-rootfs $ ./build-kernel deb-pkg KDEB_PACKAGEVERSION=1
+    ~/work/ev3dev-rootfs $ ./build-kernel deb-pkg KDEB_PKGVERSION=1
     ...
     <lots-of-build-output>
     ...
@@ -220,6 +216,5 @@ Common Errors
          user@host ~/ev3dev-kernel $ git clean -dfX
 
 
-[1]: https://github.com/mindboards/ev3dev
-[2]: https://github.com/ev3dev/brickstrap
-[3]: https://github.com/mindboards/ev3dev/wiki
+[brickstrap]: https://github.com/ev3dev/brickstrap
+[wiki]: https://github.com/ev3dev/ev3dev/wiki
