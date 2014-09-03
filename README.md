@@ -126,8 +126,7 @@ When you run `./build-kernel` if no existing kernel configuration exists
 the default configuration is loaded from `arch/arm/configs/ev3dev_defconfig`.
 
 If you make changes to your local kernel configuration that you want to merge
-into the default configuration, run `./defconfig update`. If you want to
-selectively merge changes, run `./defconfig update -i` which will open the
+into the default configuration, run `./defconfig update`. It will use the
 merge tool specified by the EV3DEV_MERGE_CMD environment variable.
 
 If you have an existing kernel configuration, you will want to check for changes

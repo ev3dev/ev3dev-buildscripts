@@ -22,13 +22,8 @@ show_usage ()
 	echo "merge    Calls a merge tool to merges the contents of ev3dev_defconfig"
 	echo "         into the current kernel configuration"
 	echo
-	echo "update   Replaces arch/arm/configs/ev3dev_defconfig with the current"
-	echo "         kernel configuration"
-	echo
-	echo "OPTIONS"
-	echo "-------"
-	echo "-i       When used with the update command, a merge tool will be called"
-	echo "         to merge the current kernel configuration with ev3dev_defconfig"
+	echo "update   Calls a merge tool to the current kernel configuration into"
+        echo " arch/arm/configs/ev3dev_defconfig with the current"
 	echo
 	echo "REMARKS"
 	echo "-------"
@@ -51,11 +46,8 @@ check_for_local_config()
 
 if [ $# -gt 1 ]
 then
-	if [ "$1" != "update" -o "$2" != "-i" ]
-	then
-		show_usage
-		exit 1
-	fi
+	show_usage
+	exit 1
 fi
 
 case "$1" in
@@ -90,15 +82,10 @@ case "$1" in
 	update)
 		check_for_local_config
 		make ${make_args} savedefconfig || exit $?
-		if [ "$2" = "-i" ]
-		then
-			export file1=${obj_path}/defconfig
-			export file2=${kernel_src_path}/arch/arm/configs/ev3dev_defconfig
-			eval ${EV3DEV_MERGE_CMD}
-			rm -f $file1
-		else
-			mv ${obj_path}/defconfig ${kernel_src_path}/arch/arm/configs/ev3dev_defconfig
-		fi
+		export file1=${obj_path}/defconfig
+		export file2=${kernel_src_path}/arch/arm/configs/ev3dev_defconfig
+		eval ${EV3DEV_MERGE_CMD}
+		rm -f $file1
 		exit $?
 	;;
 	*)
@@ -106,5 +93,4 @@ case "$1" in
 		exit 1
 	;;
 esac
-
 
