@@ -45,10 +45,10 @@ First time kernel build
         ~/work $ git clone git://github.com/ev3dev/ev3dev-kernel
         ~/work $ git clone git://github.com/ev3dev/ev3dev-buildscripts
 
-4.  Change to the `ev3dev-rootfs` director and have a look around.
+4.  Change to the `ev3dev-buildscripts` directory and have a look around.
 
-        ~/work $ cd ev3dev-rootfs
-        ~/work/ev3dev-rootfs $ ls
+        ~/work $ cd ev3dev-buildscripts
+        ~/work/ev3dev-buildscripts $ ls
         boot.cmd        build-kernel  install-kernel-build-tools  local-env   README.md
         build-boot-scr  defconfig     LICENSE                     menuconfig  setup-env
 
@@ -57,29 +57,29 @@ First time kernel build
     ev3dev package repo and then run the `install-kernel-build-tools` script.
     (You only need to run this once.)
 
-        ~/work/ev3dev-rootfs $ .sudo apt-add-repository http://ev3dev.org/debian
-        ~/work/ev3dev-rootfs $ .sudo apt-key adv --keyserver pgp.mit.edu --recv-keys 2B210565
-        ~/work/ev3dev-rootfs $ .sudo apt-get update
-        ~/work/ev3dev-rootfs $ ./install-kernel-build-tools
+        ~/work/ev3dev-buildscripts $ .sudo apt-add-repository http://ev3dev.org/debian
+        ~/work/ev3dev-buildscripts $ .sudo apt-key adv --keyserver pgp.mit.edu --recv-keys 2B210565
+        ~/work/ev3dev-buildscripts $ .sudo apt-get update
+        ~/work/ev3dev-buildscripts $ ./install-kernel-build-tools
 
 6.  Create a `local-env` to make use of all of your processing power. See the
     [Faster Builds and Custom Locations](#faster-builds-and-custom-locations)
     section below for more about this file.
 
-        ~/work/ev3dev-rootfs $ echo "#!/bin/sh
+        ~/work/ev3dev-buildscripts $ echo "#!/bin/sh
         
         export EV3DEV_MAKE_ARGS=-j4" > local-env
 
 7.  Now we can compile the kernel.
 
-        ~/work/ev3dev-rootfs $ ./build_kernel
+        ~/work/ev3dev-buildscripts $ ./build_kernel
 
 8.  That's it! The uImage and kernel modules you just built are saved in
     `../dist`. You just need to copy the files to your
     already formatted SD card. For an easier way of getting the kernel on
     your EV3, see [Sharing Your Kernel](#sharing-your-kernel).
 
-        ~/work/ev3dev-rootfs $ cd ../dist
+        ~/work/ev3dev-buildscripts $ cd ../dist
         ~/work/dist $ cp uImage <path-to-boot-partition>/uImage
         ~/work/dist $ sudo cp -r lib/ <path-to-file-system-partition>
 
@@ -89,10 +89,10 @@ Faster Builds and Custom Locations
 
 By default the locations of the kernel source tree and the toolchain used
 to build the kernel are expected to be in certain directories relative to
-the ev3dev-rootfs repo directory.
+the ev3dev-buildscripts repo directory.
 
 You can override these locations by creating a file called `local-env`
-in the ev3dev-rootfs directory or `~/.ev3dev-env` (in your home directory).
+in the ev3dev-buildscripts directory or `~/.ev3dev-env` (in your home directory).
 It should look like this:
 
     #!/bin/sh
@@ -140,11 +140,11 @@ set up hooks in your git repo. For example, you could save the following file as
 both `.git/hooks/post-merge` and `.git/hooks/post-checkout` and you will
 be prompted to merge the default configuration into your local configuration
 whenever you merge or checkout a branch. In you followed the tutorial above,
-`<path-to-ev3dev-rootfs-repo>` would be `~/work/ev3dev-rootfs`.
+`<path-to-ev3dev-buildscripts-repo>` would be `~/work/ev3dev-buildscripts`.
 
     #!/bin/sh
     
-    <path-to-ev3dev-rootfs-repo>/defconfig merge
+    <path-to-ev3dev-buildscripts-repo>/defconfig merge
 
 
 Sharing Your Kernel
@@ -164,16 +164,16 @@ And, of course, substitute something like your github user name for _your-name_.
 
 Then, we build a Debian package.
 
-    ~/work/ev3dev-rootfs $ ./build-kernel deb-pkg KDEB_PKGVERSION=1
+    ~/work/ev3dev-buildscripts $ ./build-kernel deb-pkg KDEB_PKGVERSION=1
     ...
     <lots-of-build-output>
     ...
-    ~/work/ev3dev-rootfs $ ls ../*.deb
+    ~/work/ev3dev-buildscripts $ ls ../*.deb
     ../linux-headers-3.3.0-3-ev3dev-your-name_1_armel.deb
     ../linux-image-3.3.0-3-ev3dev-your-name_1_armel.deb
     ../linux-libc-dev_1_armel.deb
 
-Now, send the `linux-image-i*` file to your friend with these instructions:
+Now, send the `linux-image-*` file to your friend with these instructions:
 
 * Copy the `.deb` file to your EV3
 * Install the package
