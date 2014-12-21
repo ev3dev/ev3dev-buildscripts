@@ -42,7 +42,7 @@ First time kernel build
 
 3.  Clone the kernel and root file system repos.
 
-        ~/work $ git clone git://github.com/ev3dev/ev3dev-kernel
+        ~/work $ git clone --recursive git://github.com/ev3dev/ev3dev-kernel
         ~/work $ git clone git://github.com/ev3dev/ev3dev-buildscripts
 
 4.  Change to the `ev3dev-buildscripts` directory and have a look around.
