@@ -40,10 +40,16 @@ First time kernel build
         ~ $ mkdir work
         ~ $ cd work
 
-3.  Clone the kernel and root file system repos.
+3.  Clone this repo and also the ev3dev-kernel repo, then make sure the lego
+    drivers submodule is up to date (we don't alway update the submodule
+    commit in the kernel repo, so you have to pull manually to get the
+    most recent commits).
 
-        ~/work $ git clone --recursive git://github.com/ev3dev/ev3dev-kernel
         ~/work $ git clone git://github.com/ev3dev/ev3dev-buildscripts
+        ~/work $ git clone --recursive git://github.com/ev3dev/ev3dev-kernel
+        ~/work $ cd drivers/lego
+        ~/work/drivers/lego $ git pull
+        ~/work/drivers/lego $ cd ../..
 
 4.  Change to the `ev3dev-buildscripts` directory and have a look around.
 
