@@ -41,7 +41,7 @@ First time kernel build
         ~ $ cd work
 
 3.  Clone this repo and also the ev3dev-kernel repo, then make sure the lego
-    drivers submodule is up to date (we don't alway update the submodule
+    drivers submodule is up to date (we don't always update the submodule
     commit in the kernel repo, so you have to pull manually to get the
     most recent commits).
 
