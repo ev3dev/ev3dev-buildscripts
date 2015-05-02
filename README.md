@@ -25,6 +25,11 @@ Scripts
 `menuconfig`                 Runs the menu configuration tool for the
                              kernel configuration.
 
+`pbuilder-dist`              Modified version of `pbuilder-dist` from
+                             `ubuntu-dev-tools` package. Allow you to specify
+                             architecture of `rpi` to build packages for
+                             Raspbian (amrv6).
+
 
 First time kernel build
 -----------------------

@@ -1,0 +1,530 @@
+#! /usr/bin/python
+# -*- coding: utf-8 -*-
+#
+# Copyright (C) 2007-2010, Siegfried-A. Gevatter <rainct@ubuntu.com>,
+#               2010-2011, Stefano Rivera <stefanor@ubuntu.com>
+# With some changes by Iain Lane <iain@orangesquash.org.uk>
+# Based upon pbuilder-dist-simple by Jamin Collins and Jordan Mantha.
+# Raspbian changes Copyright (C) 2015, David Lechner <david@lechnology.com>
+#
+# ##################################################################
+#
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; either version 2
+# of the License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# See file /usr/share/common-licenses/GPL-2 for more details.
+#
+# ##################################################################
+#
+# This script is a wrapper to be able to easily use pbuilder/cowbuilder for
+# different distributions (eg, Gutsy, Hardy, Debian unstable, etc).
+#
+# You can create symlinks to a pbuilder-dist executable to get different
+# configurations. For example, a symlink called pbuilder-hardy will assume
+# that the target distribution is always meant to be Ubuntu Hardy.
+
+import os
+import sys
+
+import debian.deb822
+from distro_info import DebianDistroInfo, UbuntuDistroInfo, DistroDataOutdated
+
+import ubuntutools.misc
+import ubuntutools.version
+from ubuntutools.config import UDTConfig
+from ubuntutools.logger import Logger
+from ubuntutools.question import YesNoQuestion
+from ubuntutools import subprocess
+
+
+class PbuilderDist(object):
+    def __init__(self, builder):
+        # Base directory where pbuilder will put all the files it creates.
+        self.base = None
+
+        # Name of the operation which pbuilder should perform.
+        self.operation = None
+
+        # Wheter additional components should be used or not. That is,
+        # 'universe' and 'multiverse' for Ubuntu chroots and 'contrib'
+        # and 'non-free' for Debian.
+        self.extra_components = True
+
+        # Extra pockets, useful on stable releases
+        self.enable_security = True
+        self.enable_updates = True
+        self.enable_proposed = True
+
+        # File where the log of the last operation will be saved.
+        self.logfile = None
+
+        # System architecture
+        self.system_architecture = None
+
+        # Build architecture
+        self.build_architecture = None
+
+        # System's distribution
+        self.system_distro = None
+
+        # Target distribution
+        self.target_distro = None
+        self.raspbian = False
+
+        # This is an identificative string which will either take the form
+        # 'distribution' or 'distribution-architecture'.
+        self.chroot_string = None
+
+        # Authentication method
+        self.auth = 'sudo'
+
+        # Builder
+        self.builder = builder
+
+        self._debian_distros = DebianDistroInfo().all + \
+            ['stable', 'testing', 'unstable']
+
+        # Ensure that the used builder is installed
+        paths = set(os.environ['PATH'].split(':'))
+        paths |= set(('/sbin', '/usr/sbin', '/usr/local/sbin'))
+        if not any(os.path.exists(os.path.join(p, builder)) for p in paths):
+            Logger.error('Could not find "%s".', builder)
+            sys.exit(1)
+
+        ##############################################################
+
+        self.base = os.path.expanduser(os.environ.get('PBUILDFOLDER',
+                                                      '~/pbuilder/'))
+
+        if 'SUDO_USER' in os.environ:
+            Logger.warn('Running under sudo. '
+                        'This is probably not what you want. '
+                        'pbuilder-dist will use sudo itself, when necessary.')
+        if os.stat(os.environ['HOME']).st_uid != os.getuid():
+            Logger.error("You don't own $HOME")
+            sys.exit(1)
+
+        if not os.path.isdir(self.base):
+            try:
+                os.makedirs(self.base)
+            except OSError:
+                Logger.error('Cannot create base directory "%s"', self.base)
+                sys.exit(1)
+
+        if 'PBUILDAUTH' in os.environ:
+            self.auth = os.environ['PBUILDAUTH']
+
+        self.system_architecture = ubuntutools.misc.host_architecture()
+        self.system_distro = ubuntutools.misc.system_distribution()
+        if not self.system_architecture or not self.system_distro:
+            sys.exit(1)
+
+        self.target_distro = self.system_distro
+
+    def set_target_distro(self, distro):
+        """ PbuilderDist.set_target_distro(distro) -> None
+
+        Check if the given target distribution name is correct, if it
+        isn't know to the system ask the user for confirmation before
+        proceeding, and finally either save the value into the appropiate
+        variable or finalize pbuilder-dist's execution.
+        """
+        if not distro.isalpha():
+            Logger.error('"%s" is an invalid distribution codename.', distro)
+            sys.exit(1)
+
+        if not os.path.isfile(os.path.join('/usr/share/debootstrap/scripts/',
+                                           distro)):
+            if os.path.isdir('/usr/share/debootstrap/scripts/'):
+                # Debian experimental doesn't have a debootstrap file but
+                # should work nevertheless.
+                if distro not in self._debian_distros:
+                    question = ('Warning: Unknown distribution "%s". '
+                                'Do you want to continue' % distro)
+                    answer = YesNoQuestion().ask(question, 'no')
+                    if answer == 'yes':
+                        sys.exit(0)
+            else:
+                Logger.error('Please install package "debootstrap".')
+                sys.exit(1)
+
+        self.target_distro = distro
+
+    def set_operation(self, operation):
+        """ PbuilderDist.set_operation -> None
+
+        Check if the given string is a valid pbuilder operation and
+        depending on this either save it into the appropiate variable
+        or finalize pbuilder-dist's execution.
+        """
+        arguments = ('create', 'update', 'build', 'clean', 'login', 'execute')
+
+        if operation not in arguments:
+            if operation.endswith('.dsc'):
+                if os.path.isfile(operation):
+                    self.operation = 'build'
+                    return [operation]
+                else:
+                    Logger.error('Could not find file "%s".', operation)
+                    sys.exit(1)
+            else:
+                Logger.error('"%s" is not a recognized argument.\n'
+                             'Please use one of these: %s.',
+                             operation, ', '.join(arguments))
+                sys.exit(1)
+        else:
+            self.operation = operation
+            return []
+
+    def get_command(self, remaining_arguments=None):
+        """ PbuilderDist.get_command -> string
+
+        Generate the pbuilder command which matches the given configuration
+        and return it as a string.
+        """
+        if not self.build_architecture:
+            self.build_architecture = self.system_architecture
+
+        if self.build_architecture == self.system_architecture:
+            self.chroot_string = self.target_distro
+        elif self.raspbian:
+            self.chroot_string = (self.target_distro + '-rpi')
+        else:
+            self.chroot_string = (self.target_distro + '-'
+                                  + self.build_architecture)
+
+        prefix = os.path.join(self.base, self.chroot_string)
+        if '--buildresult' not in remaining_arguments:
+            result = os.path.normpath('%s_result/' % prefix)
+        else:
+            location_of_arg = remaining_arguments.index('--buildresult')
+            result = os.path.normpath(remaining_arguments[location_of_arg+1])
+            remaining_arguments.pop(location_of_arg+1)
+            remaining_arguments.pop(location_of_arg)
+
+        if not self.logfile and self.operation != 'login':
+            if self.operation == 'build':
+                dsc_files = [a for a in remaining_arguments
+                             if a.strip().endswith('.dsc')]
+                assert len(dsc_files) == 1
+                dsc = debian.deb822.Dsc(open(dsc_files[0]))
+                version = ubuntutools.version.Version(dsc['Version'])
+                name = (dsc['Source'] + '_' + version.strip_epoch() + '_' +
+                        str(self.raspbian and 'rpi' or self.build_architecture) +
+                        '.build')
+                self.logfile = os.path.join(result, name)
+            else:
+                self.logfile = os.path.join(result, 'last_operation.log')
+
+        if not os.path.isdir(result):
+            try:
+                os.makedirs(result)
+            except OSError:
+                Logger.error('Cannot create results directory "%s"', result)
+                sys.exit(1)
+
+        arguments = [
+            '--%s' % self.operation,
+            '--distribution', self.target_distro,
+            '--buildresult', result,
+        ]
+
+        if self.operation == 'update':
+            arguments += ['--override-config']
+
+        if self.builder == 'pbuilder':
+            arguments += ['--basetgz', prefix + '-base.tgz']
+        elif self.builder == 'cowbuilder':
+            arguments += ['--basepath', prefix + '-base.cow']
+        else:
+            Logger.error('Unrecognized builder "%s".', self.builder)
+            sys.exit(1)
+
+        if self.logfile:
+            arguments += ['--logfile', self.logfile]
+
+        if os.path.exists('/var/cache/archive/'):
+            arguments += ['--bindmounts', '/var/cache/archive/']
+
+        localrepo = '/var/cache/archive/' + self.target_distro
+        if os.path.exists(localrepo):
+            arguments += [
+                '--othermirror',
+                'deb file:///var/cache/archive/ %s/' % self.target_distro,
+            ]
+
+        config = UDTConfig()
+        if self.raspbian:
+            mirror = os.environ.get('MIRRORSITE',
+                                    config.get_value('RASPBIAN_MIRROR') \
+                                    or 'http://archive.raspbian.org/raspbian')
+            components = 'main'
+            if self.extra_components:
+                components += ' contrib non-free'
+        elif self.target_distro in self._debian_distros:
+            mirror = os.environ.get('MIRRORSITE',
+                                    config.get_value('DEBIAN_MIRROR'))
+            components = 'main'
+            if self.extra_components:
+                components += ' contrib non-free'
+        else:
+            mirror = os.environ.get('MIRRORSITE',
+                                    config.get_value('UBUNTU_MIRROR'))
+            if self.build_architecture not in ('amd64', 'i386'):
+                mirror = os.environ.get(
+                    'MIRRORSITE', config.get_value('UBUNTU_PORTS_MIRROR'))
+            components = 'main restricted'
+            if self.extra_components:
+                components += ' universe multiverse'
+
+        arguments += ['--mirror', mirror]
+
+        othermirrors = []
+        if self.target_distro in self._debian_distros:
+            debian_info = DebianDistroInfo()
+            try:
+                codename = debian_info.codename(self.target_distro,
+                                                default=self.target_distro)
+            except DistroDataOutdated, error:
+                Logger.warn(error)
+            if codename in (debian_info.devel(), 'experimental'):
+                self.enable_security = False
+                self.enable_updates = False
+                self.enable_proposed = False
+            elif codename in (debian_info.testing(), 'testing'):
+                self.enable_updates = False
+
+            if self.enable_security:
+                othermirrors.append('deb %s %s/updates %s'
+                                    % (config.get_value('DEBSEC_MIRROR'),
+                                       self.target_distro, components))
+            if self.enable_updates:
+                othermirrors.append('deb %s %s-updates %s'
+                                    % (mirror, self.target_distro, components))
+            if self.enable_proposed:
+                othermirrors.append('deb %s %s-proposed-updates %s'
+                                    % (mirror, self.target_distro, components))
+
+            aptcache = os.path.join(self.base, 'aptcache', 'debian')
+        else:
+            try:
+                dev_release = self.target_distro == UbuntuDistroInfo().devel()
+            except DistroDataOutdated, error:
+                Logger.warn(error)
+                dev_release = True
+
+            if dev_release:
+                self.enable_security = False
+                self.enable_updates = False
+
+            if self.enable_security:
+                othermirrors.append('deb %s %s-security %s'
+                                    % (mirror, self.target_distro, components))
+            if self.enable_updates:
+                othermirrors.append('deb %s %s-updates %s'
+                                    % (mirror, self.target_distro, components))
+            if self.enable_proposed:
+                othermirrors.append('deb %s %s-proposed %s'
+                                    % (mirror, self.target_distro, components))
+
+            aptcache = os.path.join(self.base, 'aptcache', 'ubuntu')
+
+        if 'OTHERMIRROR' in os.environ:
+            othermirrors += os.environ['OTHERMIRROR'].split('|')
+
+        if othermirrors:
+            arguments += ['--othermirror', '|'.join(othermirrors)]
+
+        # Work around LP:#599695
+        if (self.raspbian):
+            if not os.path.exists(
+                    '/usr/share/keyrings/raspbian-archive-keyring.gpg'):
+                Logger.error('raspbian-keyring not installed')
+                sys.exit(1)
+            arguments += [
+                '--debootstrapopts',
+                '--keyring=/usr/share/keyrings/raspbian-archive-keyring.gpg',
+            ]
+        elif (ubuntutools.misc.system_distribution() == 'Debian'
+                and self.target_distro not in self._debian_distros):
+            if not os.path.exists(
+                    '/usr/share/keyrings/ubuntu-archive-keyring.gpg'):
+                Logger.error('ubuntu-keyring not installed')
+                sys.exit(1)
+            arguments += [
+                '--debootstrapopts',
+                '--keyring=/usr/share/keyrings/ubuntu-archive-keyring.gpg',
+            ]
+        elif (ubuntutools.misc.system_distribution() == 'Ubuntu'
+                and self.target_distro in self._debian_distros):
+            if not os.path.exists(
+                    '/usr/share/keyrings/debian-archive-keyring.gpg'):
+                Logger.error('debian-archive-keyring not installed')
+                sys.exit(1)
+            arguments += [
+                '--debootstrapopts',
+                '--keyring=/usr/share/keyrings/debian-archive-keyring.gpg',
+            ]
+
+        arguments += ['--aptcache', aptcache, '--components', components]
+
+        if not os.path.isdir(aptcache):
+            try:
+                os.makedirs(aptcache)
+            except OSError:
+                Logger.error('Cannot create aptcache directory "%s"', aptcache)
+                sys.exit(1)
+
+        if self.build_architecture != self.system_architecture:
+            arguments += ['--debootstrapopts',
+                          '--arch=' + self.build_architecture]
+
+        apt_conf_dir = os.path.join(self.base,
+                                    'etc/%s/apt.conf' % self.target_distro)
+        if os.path.exists(apt_conf_dir):
+            arguments += ['--aptconfdir', apt_conf_dir]
+
+        # Append remaining arguments
+        if remaining_arguments:
+            arguments.extend(remaining_arguments)
+
+        # Export the distribution and architecture information to the
+        # environment so that it is accessible to ~/.pbuilderrc (LP: #628933).
+        # With both common variable name schemes (BTS: #659060).
+        return [
+            self.auth,
+            'HOME=' + os.path.expanduser('~'),
+            'ARCHITECTURE=' + self.build_architecture,
+            'DISTRIBUTION=' + self.target_distro,
+            'ARCH=' + self.build_architecture,
+            'DIST=' + self.target_distro,
+            'DEB_BUILD_OPTIONS=' + os.environ.get('DEB_BUILD_OPTIONS', ''),
+            self.builder,
+        ] + arguments
+
+
+def show_help(exit_code=0):
+    """ help() -> None
+
+    Print a help message for pbuilder-dist, and exit with the given code.
+    """
+    print 'See  man pbuilder-dist  for more information.'
+
+    sys.exit(exit_code)
+
+
+def main():
+    """ main() -> None
+
+    This is pbuilder-dist's main function. It creates a PbuilderDist
+    object, modifies all necessary settings taking data from the
+    executable's name and command line options and finally either ends
+    the script and runs pbuilder itself or exists with an error message.
+    """
+    script_name = os.path.basename(sys.argv[0])
+    parts = script_name.split('-')
+
+    # Copy arguments into another list for save manipulation
+    args = sys.argv[1:]
+
+    if ('-' in script_name and parts[0] not in ('pbuilder', 'cowbuilder')
+            or len(parts) > 3):
+        Logger.error('"%s" is not a valid name for a "pbuilder-dist" '
+                     'executable.', script_name)
+        sys.exit(1)
+
+    if len(args) < 1:
+        Logger.error('Insufficient number of arguments.')
+        show_help(1)
+
+    if args[0] in ('-h', '--help', 'help'):
+        show_help(0)
+
+    app = PbuilderDist(parts[0])
+
+    if len(parts) > 1 and parts[1] != 'dist' and '.' not in parts[1]:
+        app.set_target_distro(parts[1])
+    else:
+        app.set_target_distro(args.pop(0))
+
+    if len(parts) > 2:
+        requested_arch = parts[2]
+    elif len(args) > 0 and args[0] in (
+            'alpha', 'amd64', 'arm', 'armeb', 'armel', 'armhf', 'arm64',
+            'i386', 'lpia', 'm68k', 'mips', 'mipsel', 'powerpc', 'ppc64',
+            'ppc64el', 'sh4', 'sh4eb', 'sparc', 'sparc64', 'rpi'):
+        requested_arch = args.pop(0)
+    else:
+        requested_arch = None
+
+    if requested_arch:
+        if requested_arch == 'rpi':
+            app.raspbian = True
+            app.enable_security = False
+            app.enable_updates = False
+            app.enable_proposed = False
+            requested_arch = 'armhf'
+        app.build_architecture = requested_arch
+        # For some foreign architectures we need to use qemu
+        if (requested_arch != app.system_architecture
+                and (app.system_architecture, requested_arch) not in [
+                    ('amd64', 'i386'), ('amd64', 'lpia'), ('arm', 'armel'),
+                    ('armel', 'arm'), ('armel', 'armhf'), ('armhf', 'armel'),
+                    ('arm64', 'arm'), ('arm64', 'armhf'), ('arm64', 'armel'),
+                    ('i386', 'lpia'), ('lpia', 'i386'), ('powerpc', 'ppc64'),
+                    ('ppc64', 'powerpc'), ('sparc', 'sparc64'),
+                    ('sparc64', 'sparc')]):
+            args += ['--debootstrap', 'qemu-debootstrap']
+
+    if 'mainonly' in sys.argv or '--main-only' in sys.argv:
+        app.extra_components = False
+        if 'mainonly' in sys.argv:
+            args.remove('mainonly')
+        else:
+            args.remove('--main-only')
+
+    if '--release-only' in sys.argv:
+        args.remove('--release-only')
+        app.enable_security = False
+        app.enable_updates = False
+        app.enable_proposed = False
+    elif '--security-only' in sys.argv:
+        args.remove('--security-only')
+        app.enable_updates = False
+        app.enable_proposed = False
+    elif '--updates-only' in sys.argv:
+        args.remove('--updates-only')
+        app.enable_proposed = False
+
+    if len(args) < 1:
+        Logger.error('Insufficient number of arguments.')
+        show_help(1)
+
+    # Parse the operation
+    args = app.set_operation(args.pop(0)) + args
+
+    if app.operation == 'build':
+        if len([a for a in args if a.strip().endswith('.dsc')]) != 1:
+            msg = 'You have to specify one .dsc file if you want to build.'
+            Logger.error(msg)
+            sys.exit(1)
+
+    # Execute the pbuilder command
+    if not '--debug-echo' in args:
+        sys.exit(subprocess.call(app.get_command(args)))
+    else:
+        print app.get_command([arg for arg in args if arg != '--debug-echo'])
+
+if __name__ == '__main__':
+    try:
+        main()
+    except KeyboardInterrupt:
+        Logger.error('Manually aborted.')
+        sys.exit(1)
