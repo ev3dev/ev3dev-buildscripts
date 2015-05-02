@@ -1,6 +1,6 @@
 #!/bin/sh
 # ------------------------------------------------------------------------------
-# defconfig - Manages the ev3dev_defconfig file in the kernel tree.
+# defconfig - Manages the ${EV3DEV_DEFCONFIG} file in the kernel tree.
 # ------------------------------------------------------------------------------
 
 . ./setup-env
@@ -16,20 +16,19 @@ show_usage ()
 	echo "COMMANDS"
 	echo "--------"
 	echo "load     Replaces the current kernel configuration with the configuration"
-	echo "         specified ev3dev_defconfig. WARNING: You will lose any changes"
+	echo "         specified ${EV3DEV_DEFCONFIG}. WARNING: You will lose any changes"
 	echo "         that you made to the local kernel configuration."
 	echo
-	echo "merge    Calls a merge tool to merges the contents of ev3dev_defconfig"
+	echo "merge    Calls a merge tool to merges the contents of ${EV3DEV_DEFCONFIG}"
 	echo "         into the current kernel configuration"
 	echo
 	echo "update   Calls a merge tool to the current kernel configuration into"
-        echo " arch/arm/configs/ev3dev_defconfig with the current"
+        echo " arch/arm/configs/${EV3DEV_DEFCONFIG} with the current"
 	echo
 	echo "REMARKS"
 	echo "-------"
-	echo "ev3dev_defconfig is located at arch/arm/configs/ev3dev_defconfig in the"
-	echo "kernel tree. The current configuration is located at ../obj/.config"
-	echo "unless you have overridden the object directory in ./local-env."
+	echo "${EV3DEV_DEFCONFIG} is located at arch/arm/configs/${EV3DEV_DEFCONFIG} in the"
+	echo "kernel tree. The current configuration is located at ${obj_path}/.config"
 	echo
 	echo "The merge tool is specified by the EV3DEV_MERGE_CMD environment variable."
 	echo "You can override this in ./local-env."
@@ -65,13 +64,13 @@ case "$1" in
 			fi
 		fi
 		rm -f ${obj_path}/.config
-		make ${make_args} defconfig KBUILD_DEFCONFIG=ev3dev_defconfig
+		make ${make_args} defconfig KBUILD_DEFCONFIG=${EV3DEV_DEFCONFIG}
 		exit $?
 	;;
 	merge)
 		check_for_local_config
 		mv ${obj_path}/.config ${obj_path}/.config.old
-		make ${make_args} defconfig KBUILD_DEFCONFIG=ev3dev_defconfig
+		make ${make_args} defconfig KBUILD_DEFCONFIG=${EV3DEV_DEFCONFIG}
 		mv ${obj_path}/.config ${obj_path}/.config.new
 		mv ${obj_path}/.config.old ${obj_path}/.config
 		export file1=${obj_path}/.config.new
@@ -83,7 +82,7 @@ case "$1" in
 		check_for_local_config
 		make ${make_args} savedefconfig || exit $?
 		export file1=${obj_path}/defconfig
-		export file2=${kernel_src_path}/arch/arm/configs/ev3dev_defconfig
+		export file2=${kernel_src_path}/arch/arm/configs/${EV3DEV_DEFCONFIG}
 		eval ${EV3DEV_MERGE_CMD}
 		rm -f $file1
 		exit $?

@@ -16,8 +16,8 @@ Scripts
 
 `build-kernel`               Used to build the kernel.
 
-`defconfig`                  Used to manage the ev3dev_defconfig file and
-                             your current local configuration.
+`defconfig`                  Used to manage the `*_defconfig` file and
+                             your current local configuration (`.config`).
 
 `install-kernel-build-tools` Installs the prerequisite tools required
                              to build the kernel.
@@ -121,7 +121,7 @@ mount the EV3 root file system. You can use nfs or sshfs (check the
 `local-env` like this:
 
     # replace `/mnt/ev3dev-root` with your actual mount point
-    export EV3DEV_INSTALL_KERNEL=/mnt/ev3dev-root/media/mmc_p1
+    export EV3DEV_INSTALL_KERNEL=/mnt/ev3dev-root/boot/flash
     export EV3DEV_INSTALL_MODULES=/mnt/ev3dev-root
 
 
@@ -133,7 +133,7 @@ the default configuration is loaded from `arch/arm/configs/ev3dev_defconfig`.
 
 If you make changes to your local kernel configuration that you want to merge
 into the default configuration, run `./defconfig update`. It will use the
-merge tool specified by the EV3DEV_MERGE_CMD environment variable.
+merge tool specified by the `EV3DEV_MERGE_CMD` environment variable.
 
 If you have an existing kernel configuration, you will want to check for changes
 to the default configuration each time you merge or checkout a branch. You can
@@ -163,10 +163,12 @@ First, we want to set a kernel option so that our friends will know what kernel
 they are running. Run `./menuconfig` and set this option:
 
     General setup --->
-      (-your-name) Local version - append to kernel release
+      (-your-name-ev3) Local version - append to kernel release
 
-Make sure to include the '-' prefix in `-your-name` on the _Local version_.
-And, of course, substitute something like your github user name for _your-name_.
+Make sure to include the '-' prefix in `-your-name` on the *Local version*.
+And, of course, substitute something like your github user name for *your-name*.
+It is also important that the kernel release ends with `-ev3` so that
+`flash-kernel` will recognize it as a "good" kernel and install it automatically.
 
 Then, we build a Debian package.
 
@@ -175,8 +177,8 @@ Then, we build a Debian package.
     <lots-of-build-output>
     ...
     ~/work/ev3dev-buildscripts $ ls ../*.deb
-    ../linux-headers-3.3.0-3-ev3dev-your-name_1_armel.deb
-    ../linux-image-3.3.0-3-ev3dev-your-name_1_armel.deb
+    ../linux-headers-3.16.7-ckt9-5-ev3dev-your-name-ev3_1_armel.deb
+    ../linux-image-3.16.7-ckt9-5-ev3dev-your-name-ev3_1_armel.deb
     ../linux-libc-dev_1_armel.deb
 
 Now, send the `linux-image-*` file to your friend with these instructions:
@@ -187,10 +189,10 @@ Now, send the `linux-image-*` file to your friend with these instructions:
 
 Example:
 
-    user@host ~ $ scp linux-image-*.deb root@ev3dev:/tmp
-    user@host ~ $ ssh root@ev3dev
-    root@ev3dev:~# dpkg --install /tmp/linux-image-*.deb
-    root@ev3dev:~# reboot
+    user@host ~ $ scp linux-image-*.deb otheruser@ev3dev:~
+    user@host ~ $ ssh otheruser@ev3dev
+    otheruser@ev3dev:~$ sudo dpkg --install ~/linux-image-*.deb
+    otheruser@ev3dev:~$ sudo reboot
 
 Common Errors
 -------------
@@ -207,7 +209,7 @@ Common Errors
           Generating include/generated/mach-types.h
           CC      kernel/bounds.s
         In file included from /home/user/ev3dev-kernel/arch/arm/include/asm/types.h:4:0,
-                          from /home/user/ev3dev-kernel/include/linux/types.h:4,
+                         from /home/user/ev3dev-kernel/include/linux/types.h:4,
                          from /home/user/ev3dev-kernel/include/linux/page-flags.h:8,
                          from /home/user/ev3dev-kernel/kernel/bounds.c:9:
         /home/user/ev3dev-kernel/include/asm-generic/int-ll64.h:11:29: fatal error: asm/bitsperlong.h: No such file or directory
@@ -220,6 +222,37 @@ Common Errors
 
          user@host ~/ev3dev-kernel $ git clean -dfX
 
+Building the kernel for ev3dev on Raspberry Pi
+----------------------------------------------
+
+There are a few changes needed to build the rpi-ev3dev kernel.
+
+1.  You need to install some additional packages:
+
+        sudo apt-get install rpi-mkimage gcc-linaro-arm-linux-gnueabihf-raspbian
+
+2.  You need to clone the `rpi-ev3dev-kernel` repository instead of the
+    `ev3dev-kernel` repository.
+
+        git clone git://github.com/ev3dev/rpi-ev3dev-kernel
+
+3.  You need to add something like this your your `local-env` file to ensure the
+    correct kernel source, architecture and toolchain are used.
+
+        function rpi {
+            export EV3DEV_LINUX="rpi-ev3dev-kernel"
+            export EV3DEV_TOOLCHAIN="/usr/lib/gcc-linaro-arm-linux-gnueabihf-raspbian/bin"
+            export EV3DEV_ABI="arm-linux-gnueabihf-"
+            export EV3DEV_DEFCONFIG="ev3devrpi_defconfig"
+            export KBUILD_DEBARCH=armhf
+        }
+        rpi
+
+    The reason for using a function is so you an just comment the `rpi` line to
+    disable the whole section.
+
+4.  If you add a local version to the kernel release (as you should be doing),
+    the last bit needs to be `-rpi` instead of `-ev3`.
 
 [brickstrap]: https://github.com/ev3dev/brickstrap
 [wiki]: https://github.com/ev3dev/ev3dev/wiki

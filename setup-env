@@ -33,6 +33,9 @@ export EV3DEV_BUILD_AREA=".."
 # This is where the ev3dev linux kernel git repository is checked out
 export EV3DEV_KERNEL="${EV3DEV_BUILD_AREA}/${EV3DEV_LINUX}"
 
+# This is the default configuration to use when building the kernel
+export EV3DEV_DEFCONFIG="ev3dev_defconfig"
+
 # This is the directory where the kernel will be built
 export EV3DEV_OBJ="${EV3DEV_BUILD_AREA}/obj"
 
@@ -42,11 +45,11 @@ export EV3DEV_INSTALL_KERNEL="${EV3DEV_BUILD_AREA}/dist"
 # This is where the kernel modules will be installed after the kernel is built
 export EV3DEV_INSTALL_MODULES="${EV3DEV_BUILD_AREA}/dist"
 
+# This is where the device tree blocks will be installed after the kernel is built
+export EV3DEV_INSTALL_DTBS="${EV3DEV_BUILD_AREA}/dist/dtbs"
+
 # This is the command that the defconfig script uses to merge files
 export EV3DEV_MERGE_CMD="vimdiff \$file1 \$file2"
-
-# This is the network host name/address of your EV3 brick
-export EV3DEV_NET_ADDR="ev3dev"
 
 # This is how you override these values (by creating one of these files)
 if [ -f ~/.ev3dev-env ]
