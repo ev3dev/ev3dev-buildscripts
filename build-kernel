@@ -19,19 +19,19 @@ kernel_install_path="$EV3DEV_INSTALL_KERNEL"
 modules_install_path="$EV3DEV_INSTALL_MODULES"
 dtbs_install_path="$EV3DEV_INSTALL_DTBS"
 make_args="$EV3DEV_MAKE_ARGS -C ${kernel_src_path} KBUILD_OUTPUT=${obj_path} \
-ARCH=arm
-CROSS_COMPILE=$EV3DEV_TOOLCHAIN/$EV3DEV_ABI"
+ARCH=arm CROSS_COMPILE=$EV3DEV_TOOLCHAIN/$EV3DEV_ABI"
 
 if [ ! -d "${obj_path}" ]
 then
 	echo "CREATING OBJ DIRECTORY"
 	mkdir -p "${obj_path}"
+	make ${make_args} mrproper
 fi
 
 if [ ! -f "${obj_path}/.config" ]
 then
 	echo "LOADING DEFAULT KERNEL CONFIGURATION"
-	make ${make_args} defconfig KBUILD_DEFCONFIG=ev3dev_defconfig
+	make ${make_args} defconfig KBUILD_DEFCONFIG=${EV3DEV_DEFCONFIG}
 fi
 
 if [ $# -eq 0 ]
