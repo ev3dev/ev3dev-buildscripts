@@ -9,7 +9,9 @@
 # If both files are present, the one in the working directory takes
 # precedence.
 #
-# This file is normally source'd from within the actual build script using:
+# BE SURE TO ALWAYS USE ABSOLUTE FILE PATHS!
+#
+# This file is normally sourced from within the actual build script using:
 #
 # . ./setup-env
 #
@@ -24,29 +26,26 @@ export EV3DEV_TOOLCHAIN="/opt/arm-2011.03/bin"
 # This is the abi used to cross-compile using the Code Sourcery toolchain
 export EV3DEV_ABI="arm-none-eabi-"
 
-# This is the name of the ev3dev linux kernel git repository
-export EV3DEV_LINUX="ev3dev-kernel"
-
 # This is where the scripts put all of generated files
-export EV3DEV_BUILD_AREA=".."
+export EV3DEV_BUILD_AREA="$HOME/build-area"
 
 # This is where the ev3dev linux kernel git repository is checked out
-export EV3DEV_KERNEL="${EV3DEV_BUILD_AREA}/${EV3DEV_LINUX}"
+export EV3DEV_KERNEL="$(pwd)/../ev3dev-kernel"
 
 # This is the default configuration to use when building the kernel
 export EV3DEV_DEFCONFIG="ev3dev_defconfig"
 
 # This is the directory where the kernel will be built
-export EV3DEV_OBJ="${EV3DEV_BUILD_AREA}/obj"
+export EV3DEV_OBJ="${EV3DEV_BUILD_AREA}/linux-ev3dev-ev3-obj"
 
 # This is where the kernel uImage will be installed after the kernel is built
-export EV3DEV_INSTALL_KERNEL="${EV3DEV_BUILD_AREA}/dist"
+export EV3DEV_INSTALL_KERNEL="${EV3DEV_BUILD_AREA}/linux-ev3dev-ev3-dist"
 
 # This is where the kernel modules will be installed after the kernel is built
-export EV3DEV_INSTALL_MODULES="${EV3DEV_BUILD_AREA}/dist"
+export EV3DEV_INSTALL_MODULES="${EV3DEV_BUILD_AREA}/linux-ev3dev-ev3-dist"
 
 # This is where the device tree blocks will be installed after the kernel is built
-export EV3DEV_INSTALL_DTBS="${EV3DEV_BUILD_AREA}/dist/dtbs"
+export EV3DEV_INSTALL_DTBS="${EV3DEV_BUILD_AREA}/linux-ev3dev-ev3-dist/dtbs"
 
 # This is the command that the defconfig script uses to merge files
 export EV3DEV_MERGE_CMD="vimdiff \$file1 \$file2"
@@ -61,4 +60,3 @@ if [ -f local-env ]
 then
 	. ./local-env
 fi
-

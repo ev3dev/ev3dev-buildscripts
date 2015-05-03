@@ -245,10 +245,14 @@ There are a few changes needed to build the rpi-ev3dev kernel.
     correct kernel source, architecture and toolchain are used.
 
         function rpi {
-            export EV3DEV_LINUX="rpi-ev3dev-kernel"
             export EV3DEV_TOOLCHAIN="/usr/lib/gcc-linaro-arm-linux-gnueabihf-raspbian/bin"
             export EV3DEV_ABI="arm-linux-gnueabihf-"
+            export EV3DEV_KERNEL="$(pwd)/../rpi-kernel"
             export EV3DEV_DEFCONFIG="ev3devrpi_defconfig"
+            export EV3DEV_OBJ="${EV3DEV_BUILD_AREA}/linux-ev3dev-rpi-obj"
+            export EV3DEV_INSTALL_KERNEL="${EV3DEV_BUILD_AREA}/linux-ev3dev-rpi-dist"
+            export EV3DEV_INSTALL_MODULES="${EV3DEV_BUILD_AREA}/linux-ev3dev-rpi-dist"
+            export EV3DEV_INSTALL_DTBS="${EV3DEV_BUILD_AREA}/linux-ev3dev-rpi-dist/dtbs"
             export KBUILD_DEBARCH=armhf
         }
         rpi
