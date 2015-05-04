@@ -30,7 +30,7 @@ export EV3DEV_ABI="arm-none-eabi-"
 export EV3DEV_BUILD_AREA="$HOME/build-area"
 
 # This is where the ev3dev linux kernel git repository is checked out
-export EV3DEV_KERNEL="$(pwd)/../ev3dev-kernel"
+export EV3DEV_KERNEL="$(pwd)/../ev3-kernel"
 
 # This is the default configuration to use when building the kernel
 export EV3DEV_DEFCONFIG="ev3dev_defconfig"
@@ -45,10 +45,34 @@ export EV3DEV_INSTALL_KERNEL="${EV3DEV_BUILD_AREA}/linux-ev3dev-ev3-dist"
 export EV3DEV_INSTALL_MODULES="${EV3DEV_BUILD_AREA}/linux-ev3dev-ev3-dist"
 
 # This is where the device tree blocks will be installed after the kernel is built
-export EV3DEV_INSTALL_DTBS="${EV3DEV_BUILD_AREA}/linux-ev3dev-ev3-dist/dtbs"
+export EV3DEV_INSTALL_DTBS=""
 
 # This is the command that the defconfig script uses to merge files
 export EV3DEV_MERGE_CMD="vimdiff \$file1 \$file2"
+
+if [ "$RPI" = "1" ]; then
+    export EV3DEV_TOOLCHAIN="/usr/lib/gcc-linaro-arm-linux-gnueabihf-raspbian/bin"
+    export EV3DEV_ABI="arm-linux-gnueabihf-"
+    export EV3DEV_KERNEL="$(pwd)/../rpi-kernel"
+    export EV3DEV_DEFCONFIG="ev3devrpi_defconfig"
+    export EV3DEV_OBJ="${EV3DEV_BUILD_AREA}/linux-ev3dev-rpi-obj"
+    export EV3DEV_INSTALL_KERNEL="${EV3DEV_BUILD_AREA}/linux-ev3dev-rpi-dist"
+    export EV3DEV_INSTALL_MODULES="${EV3DEV_BUILD_AREA}/linux-ev3dev-rpi-dist"
+    export EV3DEV_INSTALL_DTBS="${EV3DEV_BUILD_AREA}/linux-ev3dev-rpi-dist/dtbs"
+    export KBUILD_DEBARCH=armhf
+fi
+
+if [ "$RPI" = "2" ]; then
+    export EV3DEV_TOOLCHAIN="/usr/bin"
+    export EV3DEV_ABI="arm-linux-gnueabihf-"
+    export EV3DEV_KERNEL="$(pwd)/../rpi-kernel"
+    export EV3DEV_DEFCONFIG="ev3devrpi2_defconfig"
+    export EV3DEV_OBJ="${EV3DEV_BUILD_AREA}/linux-ev3dev-rpi2-obj"
+    export EV3DEV_INSTALL_KERNEL="${EV3DEV_BUILD_AREA}/linux-ev3dev-rpi2-dist"
+    export EV3DEV_INSTALL_MODULES="${EV3DEV_BUILD_AREA}/linux-ev3dev-rpi2-dist"
+    export EV3DEV_INSTALL_DTBS="${EV3DEV_BUILD_AREA}/linux-ev3dev-rpi2-dist/dtbs"
+    export KBUILD_DEBARCH=armhf
+fi
 
 # This is how you override these values (by creating one of these files)
 if [ -f ~/.ev3dev-env ]

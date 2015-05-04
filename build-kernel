@@ -54,14 +54,21 @@ then
 	fi
 
 	echo "COPYING BOOTABLE IMAGE TO INSTALL DIRECTORY"
-	cp ${obj_path}/arch/arm/boot/uImage ${kernel_install_path}
+	if [ "$RPI" = "1" ]; then
+		mkknlimg ${obj_path}/arch/arm/boot/zImage ${kernel_install_path}/kernel.img
+	elif [ "$RPI" = "2" ]; then
+		mkknlimg ${obj_path}/arch/arm/boot/zImage ${kernel_install_path}/kernel7.img
+	else
+		cp ${obj_path}/arch/arm/boot/uImage ${kernel_install_path}
+	fi
 
 	echo "COPYING MODULES TO INSTALL DIRECTORY"
-	make ${make_args} modules_install INSTALL_MOD_PATH=${modules_install_path}/
+	make ${make_args} modules_install INSTALL_MOD_PATH=${modules_install_path}
 
-	# Not sure if we need this for RPi yet...
-	#echo "COPYING DEVICE TREE BLOCKS TO INSTALL DIRECTORY"
-	#make ${make_args} dtbs_install INSTALL_DTBS_PATH=${dtbs_install_path}/
+	if [ ! -z ${EV3DEV_INSTALL_DTBS} ]; then
+		echo "COPYING DEVICE TREE BLOCKS TO INSTALL DIRECTORY"
+		make ${make_args} dtbs_install INSTALL_DTBS_PATH=${dtbs_install_path}
+	fi
 else
 	echo "CROSS COMPILING KERNEL"
 	make ${make_args} $@

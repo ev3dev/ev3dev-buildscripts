@@ -45,13 +45,13 @@ First time kernel build
         ~ $ mkdir work
         ~ $ cd work
 
-3.  Clone this repo and also the ev3dev-kernel repo, then make sure the lego
+3.  Clone this repo and also the ev3-kernel repo, then make sure the lego
     drivers submodule is up to date (we don't always update the submodule
     commit in the kernel repo, so you have to pull manually to get the
     most recent commits).
 
         ~/work $ git clone git://github.com/ev3dev/ev3dev-buildscripts
-        ~/work $ git clone --recursive git://github.com/ev3dev/ev3dev-kernel
+        ~/work $ git clone --recursive git://github.com/ev3dev/ev3-kernel
         ~/work $ cd drivers/lego
         ~/work/drivers/lego $ git pull
         ~/work/drivers/lego $ cd ../..
@@ -213,11 +213,11 @@ Common Errors
         ...
           Generating include/generated/mach-types.h
           CC      kernel/bounds.s
-        In file included from /home/user/ev3dev-kernel/arch/arm/include/asm/types.h:4:0,
-                         from /home/user/ev3dev-kernel/include/linux/types.h:4,
-                         from /home/user/ev3dev-kernel/include/linux/page-flags.h:8,
-                         from /home/user/ev3dev-kernel/kernel/bounds.c:9:
-        /home/user/ev3dev-kernel/include/asm-generic/int-ll64.h:11:29: fatal error: asm/bitsperlong.h: No such file or directory
+        In file included from /home/user/ev3-kernel/arch/arm/include/asm/types.h:4:0,
+                         from /home/user/ev3-kernel/include/linux/types.h:4,
+                         from /home/user/ev3-kernel/include/linux/page-flags.h:8,
+                         from /home/user/ev3-kernel/kernel/bounds.c:9:
+        /home/user/ev3-kernel/include/asm-generic/int-ll64.h:11:29: fatal error: asm/bitsperlong.h: No such file or directory
         compilation terminated.
         make[2]: *** [kernel/bounds.s] Error 1
         make[1]: *** [prepare0] Error 2
@@ -225,7 +225,7 @@ Common Errors
 
     Then you need to clean your kernel source tree like this:
 
-         user@host ~/ev3dev-kernel $ git clean -dfX
+         user@host ~/ev3-kernel $ git clean -dfX
 
 Building the kernel for ev3dev on Raspberry Pi
 ----------------------------------------------
@@ -236,32 +236,18 @@ There are a few changes needed to build the rpi-ev3dev kernel.
 
         sudo apt-get install rpi-mkimage gcc-linaro-arm-linux-gnueabihf-raspbian
 
-2.  You need to clone the `rpi-ev3dev-kernel` repository instead of the
-    `ev3dev-kernel` repository.
+2.  You need to clone the `rpi-kernel` repository instead of the
+    `ev3-kernel` repository.
 
-        git clone git://github.com/ev3dev/rpi-ev3dev-kernel
+        git clone git://github.com/ev3dev/rpi-kernel
 
-3.  You need to add something like this your your `local-env` file to ensure the
-    correct kernel source, architecture and toolchain are used.
+3.  You need to set the `RPI` environment variable to `1` or `2` depending on
+    which model you are compiling for when calling any of the scripts.
 
-        function rpi {
-            export EV3DEV_TOOLCHAIN="/usr/lib/gcc-linaro-arm-linux-gnueabihf-raspbian/bin"
-            export EV3DEV_ABI="arm-linux-gnueabihf-"
-            export EV3DEV_KERNEL="$(pwd)/../rpi-kernel"
-            export EV3DEV_DEFCONFIG="ev3devrpi_defconfig"
-            export EV3DEV_OBJ="${EV3DEV_BUILD_AREA}/linux-ev3dev-rpi-obj"
-            export EV3DEV_INSTALL_KERNEL="${EV3DEV_BUILD_AREA}/linux-ev3dev-rpi-dist"
-            export EV3DEV_INSTALL_MODULES="${EV3DEV_BUILD_AREA}/linux-ev3dev-rpi-dist"
-            export EV3DEV_INSTALL_DTBS="${EV3DEV_BUILD_AREA}/linux-ev3dev-rpi-dist/dtbs"
-            export KBUILD_DEBARCH=armhf
-        }
-        rpi
-
-    The reason for using a function is so you an just comment the `rpi` line to
-    disable the whole section.
+    Example: `RPI=1 ./build-kernel`
 
 4.  If you add a local version to the kernel release (as you should be doing),
-    the last bit needs to be `-rpi` instead of `-ev3`.
+    the last bit needs to be `-rpi` or `-rpi2` instead of `-ev3`.
 
 [brickstrap]: https://github.com/ev3dev/brickstrap
 [wiki]: https://github.com/ev3dev/ev3dev/wiki
