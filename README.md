@@ -77,9 +77,7 @@ First time kernel build
     [Faster Builds and Custom Locations](#faster-builds-and-custom-locations)
     section below for more about this file.
 
-        ~/work/ev3dev-buildscripts $ echo "#\!/bin/sh
-        
-        export EV3DEV_MAKE_ARGS=-j4" > local-env
+        ~/work/ev3dev-buildscripts $ echo "export EV3DEV_MAKE_ARGS=-j4" > local-env
 
 7.  Now we can compile the kernel.
 
