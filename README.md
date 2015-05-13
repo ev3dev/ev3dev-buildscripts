@@ -52,9 +52,9 @@ First time kernel build
 
         ~/work $ git clone git://github.com/ev3dev/ev3dev-buildscripts
         ~/work $ git clone --recursive git://github.com/ev3dev/ev3-kernel
-        ~/work $ cd drivers/lego
-        ~/work/drivers/lego $ git pull
-        ~/work/drivers/lego $ cd ../..
+        ~/work $ cd ev3-kernel/drivers/lego
+        ~/work/ev3-kernel/drivers/lego $ git pull origin master
+        ~/work/ev3-kernel/drivers/lego $ cd ../../..
 
 4.  Change to the `ev3dev-buildscripts` directory and have a look around.
 
@@ -68,31 +68,29 @@ First time kernel build
     ev3dev package repo and then run the `install-kernel-build-tools` script.
     (You only need to run this once.)
 
-        ~/work/ev3dev-buildscripts $ .sudo apt-add-repository http://ev3dev.org/debian
-        ~/work/ev3dev-buildscripts $ .sudo apt-key adv --keyserver pgp.mit.edu --recv-keys 2B210565
-        ~/work/ev3dev-buildscripts $ .sudo apt-get update
+        ~/work/ev3dev-buildscripts $ sudo apt-add-repository http://ev3dev.org/debian
+        ~/work/ev3dev-buildscripts $ sudo apt-key adv --keyserver pgp.mit.edu --recv-keys 2B210565
+        ~/work/ev3dev-buildscripts $ sudo apt-get update
         ~/work/ev3dev-buildscripts $ ./install-kernel-build-tools
 
 6.  Create a `local-env` to make use of all of your processing power. See the
     [Faster Builds and Custom Locations](#faster-builds-and-custom-locations)
     section below for more about this file.
 
-        ~/work/ev3dev-buildscripts $ echo "#!/bin/sh
-        
-        export EV3DEV_MAKE_ARGS=-j4" > local-env
+        ~/work/ev3dev-buildscripts $ echo "export EV3DEV_MAKE_ARGS=-j4" > local-env
 
 7.  Now we can compile the kernel.
 
-        ~/work/ev3dev-buildscripts $ ./build_kernel
+        ~/work/ev3dev-buildscripts $ ./build-kernel
 
 8.  That's it! The uImage and kernel modules you just built are saved in
     `../dist`. You just need to copy the files to your
     already formatted SD card. For an easier way of getting the kernel on
     your EV3, see [Sharing Your Kernel](#sharing-your-kernel).
 
-        ~/work/ev3dev-buildscripts $ cd ../dist
-        ~/work/dist $ cp uImage <path-to-boot-partition>/uImage
-        ~/work/dist $ sudo cp -r lib/ <path-to-file-system-partition>
+        ~/work/ev3dev-buildscripts $ cd ./build-area/linux-ev3dev-ev3-dist
+        ~/work/ev3dev-buildscripts/build-area/linux-ev3dev-ev3-dist $ cp uImage <path-to-boot-partition>/uImage
+        ~/work/ev3dev-buildscripts/build-area/linux-ev3dev-ev3-dist $ sudo cp -r lib/ <path-to-file-system-partition>
 
 
 Faster Builds and Custom Locations

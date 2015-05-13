@@ -27,7 +27,7 @@ export EV3DEV_TOOLCHAIN="/opt/arm-2011.03/bin"
 export EV3DEV_ABI="arm-none-eabi-"
 
 # This is where the scripts put all of generated files
-export EV3DEV_BUILD_AREA="$HOME/build-area"
+export EV3DEV_BUILD_AREA="$(pwd)/build-area"
 
 # This is where the ev3dev linux kernel git repository is checked out
 export EV3DEV_KERNEL="$(pwd)/../ev3-kernel"
