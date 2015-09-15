@@ -45,7 +45,7 @@ if [ "$RPI" = "1" ]; then
     export EV3DEV_TOOLCHAIN=${EV3DEV_TOOLCHAIN-"/usr/lib/gcc-linaro-arm-linux-gnueabihf-raspbian/bin"}
     export EV3DEV_ABI=${EV3DEV_ABI-"arm-linux-gnueabihf-"}
     export EV3DEV_KERNEL=${EV3DEV_KERNEL-"$(pwd)/../rpi-kernel"}
-    export EV3DEV_DEFCONFIG=${EV3DEV_DEFCONFIG-"ev3devrpi_defconfig"}
+    export EV3DEV_DEFCONFIG=${EV3DEV_DEFCONFIG-"bcmrpi_defconfig"}
     export EV3DEV_OBJ=${EV3DEV_OBJ-"${EV3DEV_BUILD_AREA}/linux-ev3dev-rpi-obj"}
     export EV3DEV_INSTALL_KERNEL=${EV3DEV_INSTALL_KERNEL-"${EV3DEV_BUILD_AREA}/linux-ev3dev-rpi-dist"}
     export EV3DEV_INSTALL_MODULES=${EV3DEV_INSTALL_MODULES-"${EV3DEV_BUILD_AREA}/linux-ev3dev-rpi-dist"}
@@ -55,7 +55,7 @@ elif [ "$RPI" = "2" ]; then
     export EV3DEV_TOOLCHAIN=${EV3DEV_TOOLCHAIN-"/usr/lib/gcc-linaro-arm-linux-gnueabihf-raspbian/bin"}
     export EV3DEV_ABI=${EV3DEV_ABI-"arm-linux-gnueabihf-"}
     export EV3DEV_KERNEL=${EV3DEV_KERNEL-"$(pwd)/../rpi-kernel"}
-    export EV3DEV_DEFCONFIG=${EV3DEV_DEFCONFIG-"ev3devrpi2_defconfig"}
+    export EV3DEV_DEFCONFIG=${EV3DEV_DEFCONFIG-"bcm2709_defconfig"}
     export EV3DEV_OBJ=${EV3DEV_OBJ-"${EV3DEV_BUILD_AREA}/linux-ev3dev-rpi2-obj"}
     export EV3DEV_INSTALL_KERNEL=${EV3DEV_INSTALL_KERNEL-"${EV3DEV_BUILD_AREA}/linux-ev3dev-rpi2-dist"}
     export EV3DEV_INSTALL_MODULES=${EV3DEV_INSTALL_MODULES-"${EV3DEV_BUILD_AREA}/linux-ev3dev-rpi2-dist"}
@@ -73,3 +73,4 @@ else
 fi
 
 export EV3DEV_MERGE_CMD=${EV3DEV_MERGE_CMD-"vimdiff \$file1 \$file2"}
+
