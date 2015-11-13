@@ -68,7 +68,7 @@ First time kernel build
     ev3dev package repo and then run the `install-kernel-build-tools` script.
     (You only need to run this once.)
 
-        ~/work/ev3dev-buildscripts $ sudo apt-add-repository http://ev3dev.org/debian
+        ~/work/ev3dev-buildscripts $ sudo apt-add-repository "deb http://ev3dev.org/debian trusty main"
         ~/work/ev3dev-buildscripts $ sudo apt-key adv --keyserver pgp.mit.edu --recv-keys 2B210565
         ~/work/ev3dev-buildscripts $ sudo apt-get update
         ~/work/ev3dev-buildscripts $ ./install-kernel-build-tools
