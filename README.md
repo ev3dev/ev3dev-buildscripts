@@ -10,6 +10,28 @@ System Requirements
 -------------------
 * Debian or derivative OS (Ubuntu, Mint, etc.)
 * User account with `sudo` enabled
+* Packages:
+
+        # If you haven't already added the ev3dev.org repository...
+        sudo apt-add-repository "deb http://ev3dev.org/debian trusty main"
+        sudo apt-key adv --keyserver pgp.mit.edu --recv-keys 2B210565
+        sudo apt-get update
+        # then install required packages
+        sudo apt-get install git build-essential ncurses-dev fakeroot bc
+
+    Plus any of the following that apply...
+
+    * For EV3 kernel:
+
+            sudo apt-get install u-boot-tools code-sourcery-toolchain-arm-2011.03
+
+    * For Raspberry Pi kernel:
+
+            sudo apt-get install rpi-mkimage gcc-linaro-arm-linux-gnueabihf-raspbian
+
+    * For BeagleBone Black kernel:
+
+        sudo apt-get install u-boot-tools lzop gcc-linaro-arm-linux-gnueabihf-5.2
 
 Scripts
 -------
@@ -18,9 +40,6 @@ Scripts
 
 `defconfig`                  Used to manage the `*_defconfig` file and
                              your current local configuration (`.config`).
-
-`install-kernel-build-tools` Installs the prerequisite tools required
-                             to build the kernel.
 
 `menuconfig`                 Runs the menu configuration tool for the
                              kernel configuration.
@@ -34,21 +53,17 @@ Scripts
 First time kernel build
 -----------------------
 
-1.  If you don't have `git` already, then we need to install it.
-
-        ~ $ sudo apt-get install git
-
-2.  Create a working directory somewhere. For this tutorial, we are using
+1.  Create a working directory somewhere. For this tutorial, we are using
     `~/work`. The build scripts will generate extra subdirectories here
     so we suggest creating a new directory instead of using an existing one.
 
         ~ $ mkdir work
         ~ $ cd work
 
-3.  Clone this repo and also the ev3-kernel repo, then make sure the lego
-    drivers submodule is up to date (we don't always update the submodule
-    commit in the kernel repo, so you have to pull manually to get the
-    most recent commits).
+2.  Clone this repo and also the ev3-kernel repo (or rpi-kernel or bb.org-kernel),
+    then make sure the lego drivers submodule is up to date (we don't always
+    update the submodule commit in the kernel repo, so you have to pull manually
+    to get the most recent commits).
 
         ~/work $ git clone git://github.com/ev3dev/ev3dev-buildscripts
         ~/work $ git clone --recursive git://github.com/ev3dev/ev3-kernel
@@ -56,34 +71,33 @@ First time kernel build
         ~/work/ev3-kernel/drivers/lego $ git pull origin master
         ~/work/ev3-kernel/drivers/lego $ cd ../../..
 
-4.  Change to the `ev3dev-buildscripts` directory and have a look around.
+3.  Change to the `ev3dev-buildscripts` directory and have a look around.
 
         ~/work $ cd ev3dev-buildscripts
         ~/work/ev3dev-buildscripts $ ls
-        boot.cmd        build-kernel  install-kernel-build-tools  local-env   README.md
-        build-boot-scr  defconfig     LICENSE                     menuconfig  setup-env
+        boot.cmd        build-kernel  local-env  menuconfig     README.md
+        build-boot-scr  defconfig     LICENSE    pbuilder-dist  setup-env
 
-
-5.  Now we need to install the required tool. To do this, we need to add the
-    ev3dev package repo and then run the `install-kernel-build-tools` script.
-    (You only need to run this once.)
-
-        ~/work/ev3dev-buildscripts $ sudo apt-add-repository http://ev3dev.org/debian
-        ~/work/ev3dev-buildscripts $ sudo apt-key adv --keyserver pgp.mit.edu --recv-keys 2B210565
-        ~/work/ev3dev-buildscripts $ sudo apt-get update
-        ~/work/ev3dev-buildscripts $ ./install-kernel-build-tools
-
-6.  Create a `local-env` to make use of all of your processing power. See the
+4.  Create a `local-env` to make use of all of your processing power. See the
     [Faster Builds and Custom Locations](#faster-builds-and-custom-locations)
     section below for more about this file.
 
         ~/work/ev3dev-buildscripts $ echo "export EV3DEV_MAKE_ARGS=-j4" > local-env
 
-7.  Now we can compile the kernel.
+5.  Now we can compile the kernel.
 
         ~/work/ev3dev-buildscripts $ ./build-kernel
 
-8.  That's it! The uImage and kernel modules you just built are saved in
+    For Raspberry Pi and BeagleBone Black we need to set an environment variable.
+
+        # Rapsberry Pi 1
+        EV3DEV_KERNEL_FLAVOR=rpi ./build-kernel
+        # Raspberry Pi 2
+        EV3DEV_KERNEL_FLAVOR=rpi2 ./build-kernel
+        # BeagleBoard
+        EV3DEV_KERNEL_FLAVOR=bb.org ./build-kernel
+
+6.  That's it! The uImage and kernel modules you just built are saved in
     `../dist`. You just need to copy the files to your
     already formatted SD card. For an easier way of getting the kernel on
     your EV3, see [Sharing Your Kernel](#sharing-your-kernel).
@@ -224,28 +238,6 @@ Common Errors
     Then you need to clean your kernel source tree like this:
 
          user@host ~/ev3-kernel $ git clean -dfX
-
-Building the kernel for ev3dev on Raspberry Pi
-----------------------------------------------
-
-There are a few changes needed to build the rpi-ev3dev kernel.
-
-1.  You need to install some additional packages:
-
-        sudo apt-get install rpi-mkimage gcc-linaro-arm-linux-gnueabihf-raspbian
-
-2.  You need to clone the `rpi-kernel` repository instead of the
-    `ev3-kernel` repository.
-
-        git clone git://github.com/ev3dev/rpi-kernel
-
-3.  You need to set the `RPI` environment variable to `1` or `2` depending on
-    which model you are compiling for when calling any of the scripts.
-
-    Example: `RPI=1 ./build-kernel`
-
-4.  If you add a local version to the kernel release (as you should be doing),
-    the last bit needs to be `-rpi` or `-rpi2` instead of `-ev3`.
 
 [brickstrap]: https://github.com/ev3dev/brickstrap
 [wiki]: https://github.com/ev3dev/ev3dev/wiki

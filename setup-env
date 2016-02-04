@@ -11,18 +11,25 @@
 #
 # BE SURE TO ALWAYS USE ABSOLUTE FILE PATHS!
 #
-# Variables are:
+# Common variables are:
 #
-# EV3DEV_TOOLCHAIN: Where to find the Code Sourcery toolchain.
-# EV3DEV_ABI: The abi used to cross-compile using the Code Sourcery toolchain.
-# EV3DEV_BUILD_AREA: Where the scripts put all of generated files.
+# EV3DEV_KERNEL_FLAVOR: The kernel flavor to build (i.e. ev3, rpi, rpi2, bb.org)
 # EV3DEV_KERNEL: Where the ev3dev linux kernel git repository is checked out.
-# EV3DEV_DEFCONFIG: The default configuration to use when building the kernel.
-# EV3DEV_OBJ: The directory where the kernel will be built.
+# EV3DEV_BUILD_AREA: Where the scripts put all of generated files.
 # EV3DEV_INSTALL_KERNEL: Where the kernel uImage will be installed.
 # EV3DEV_INSTALL_MODULES: Where the kernel modules will be installed.
 # EV3DEV_INSTALL_DTBS: Where the device tree blocks will be installed.
+# EV3DEV_INSTALL_UENV_TXT: Where the uEnv.txt file is installed (BeagleBoard only).
+# EV3DEV_TOOLCHAIN: Where to find the cross-compiler toolchain.
 # EV3DEV_MERGE_CMD: The command that the defconfig script uses to merge files.
+#
+# Advanced/internal variables variables are:
+#
+# EV3DEV_ABI: The abi used for cross-compiling.
+# EV3DEV_OBJ: The directory where the kernel will be built.
+# EV3DEV_DIST: The directory where the kernel files will be installed.
+# EV3DEV_DEFCONFIG: The default configuration to use when building the kernel.
+# EV3DEV_EXTRA_DEFAULT_TARGETS: Extra make targets that are run by ./build-kernel
 #
 # This file is normally sourced from within the actual build script using:
 #
@@ -41,36 +48,58 @@ then
     . ./local-env
 fi
 
-if [ "$RPI" = "1" ]; then
+export EV3DEV_KERNEL_FLAVOR=${EV3DEV_KERNEL_FLAVOR-"ev3"}
+export EV3DEV_BUILD_AREA=${EV3DEV_BUILD_AREA-"$(pwd)/build-area"}
+export EV3DEV_MERGE_CMD=${EV3DEV_MERGE_CMD-"vimdiff \$file1 \$file2"}
+
+if [ "$EV3DEV_KERNEL_FLAVOR" = "ev3" ]; then
+    export EV3DEV_TOOLCHAIN=${EV3DEV_TOOLCHAIN-"/opt/arm-2011.03/bin"}
+    export EV3DEV_ABI=${EV3DEV_ABI-"arm-none-eabi-"}
+    export EV3DEV_KERNEL=${EV3DEV_KERNEL-"$(pwd)/../ev3-kernel"}
+    export EV3DEV_DEFCONFIG=${EV3DEV_DEFCONFIG-"ev3dev_defconfig"}
+    export EV3DEV_OBJ=${EV3DEV_OBJ-${EV3DEV_BUILD_AREA}/linux-ev3dev-ev3-obj}
+    export EV3DEV_DIST=${EV3DEV_DIST-${EV3DEV_BUILD_AREA}/linux-ev3dev-ev3-dist}
+    export EV3DEV_INSTALL_KERNEL=${EV3DEV_INSTALL_KERNEL-${EV3DEV_DIST}}
+    export EV3DEV_INSTALL_MODULES=${EV3DEV_INSTALL_MODULES-${EV3DEV_DIST}}
+    export EV3DEV_EXTRA_DEFAULT_TARGETS=uImage
+elif [ "$EV3DEV_KERNEL_FLAVOR" = "bb.org" ]; then
+    export EV3DEV_TOOLCHAIN=${EV3DEV_TOOLCHAIN-"/usr/lib/x86_64-linux-gnu/gcc-linaro-arm-linux-gnueabihf-5.2/bin"}
+    export EV3DEV_ABI=${EV3DEV_ABI-"arm-linux-gnueabihf-"}
+    export EV3DEV_KERNEL=${EV3DEV_KERNEL-"$(pwd)/../bb.org-kernel"}
+    export EV3DEV_DEFCONFIG=${EV3DEV_DEFCONFIG-"bb.org_defconfig"}
+    export EV3DEV_OBJ=${EV3DEV_OBJ-${EV3DEV_BUILD_AREA}/linux-ev3dev-bb.org-obj}
+    export EV3DEV_DIST=${EV3DEV_DIST-${EV3DEV_BUILD_AREA}/linux-ev3dev-bb.org-dist}
+    export EV3DEV_INSTALL_UENV_TXT=${EV3DEV_INSTALL_UENV_TXT=${EV3DEV_DIST}}
+    export EV3DEV_INSTALL_KERNEL=${EV3DEV_INSTALL_KERNEL-${EV3DEV_DIST}}
+    export EV3DEV_INSTALL_MODULES=${EV3DEV_INSTALL_MODULES-${EV3DEV_DIST}}
+    export EV3DEV_INSTALL_DTBS=${EV3DEV_INSTALL_DTBS-${EV3DEV_DIST}/dtbs}
+    export EV3DEV_EXTRA_DEFAULT_TARGETS="zImage dtbs"
+    export KBUILD_DEBARCH=${KBUILD_DEBARCH-armhf}
+elif [ "$EV3DEV_KERNEL_FLAVOR" = "rpi" ]; then
     export EV3DEV_TOOLCHAIN=${EV3DEV_TOOLCHAIN-"/usr/lib/gcc-linaro-arm-linux-gnueabihf-raspbian/bin"}
     export EV3DEV_ABI=${EV3DEV_ABI-"arm-linux-gnueabihf-"}
     export EV3DEV_KERNEL=${EV3DEV_KERNEL-"$(pwd)/../rpi-kernel"}
     export EV3DEV_DEFCONFIG=${EV3DEV_DEFCONFIG-"bcmrpi_defconfig"}
-    export EV3DEV_OBJ=${EV3DEV_OBJ-"${EV3DEV_BUILD_AREA}/linux-ev3dev-rpi-obj"}
-    export EV3DEV_INSTALL_KERNEL=${EV3DEV_INSTALL_KERNEL-"${EV3DEV_BUILD_AREA}/linux-ev3dev-rpi-dist"}
-    export EV3DEV_INSTALL_MODULES=${EV3DEV_INSTALL_MODULES-"${EV3DEV_BUILD_AREA}/linux-ev3dev-rpi-dist"}
-    export EV3DEV_INSTALL_DTBS=${EV3DEV_INSTALL_DTBS-"${EV3DEV_BUILD_AREA}/linux-ev3dev-rpi-dist/dtbs"}
+    export EV3DEV_OBJ=${EV3DEV_OBJ-${EV3DEV_BUILD_AREA}/linux-ev3dev-rpi-obj}
+    export EV3DEV_DIST=${EV3DEV_DIST-${EV3DEV_BUILD_AREA}/linux-ev3dev-rpi-dist}
+    export EV3DEV_INSTALL_KERNEL=${EV3DEV_INSTALL_KERNEL-${EV3DEV_DIST}}
+    export EV3DEV_INSTALL_MODULES=${EV3DEV_INSTALL_MODULES-${EV3DEV_DIST}}
+    export EV3DEV_INSTALL_DTBS=${EV3DEV_INSTALL_DTBS-${EV3DEV_DIST}/dtbs}
+    export EV3DEV_EXTRA_DEFAULT_TARGETS="zImage dtbs"
     export KBUILD_DEBARCH=${KBUILD_DEBARCH-armhf}
-elif [ "$RPI" = "2" ]; then
+elif [ "$EV3DEV_KERNEL_FLAVOR" = "rpi2" ]; then
     export EV3DEV_TOOLCHAIN=${EV3DEV_TOOLCHAIN-"/usr/lib/gcc-linaro-arm-linux-gnueabihf-raspbian/bin"}
     export EV3DEV_ABI=${EV3DEV_ABI-"arm-linux-gnueabihf-"}
     export EV3DEV_KERNEL=${EV3DEV_KERNEL-"$(pwd)/../rpi-kernel"}
     export EV3DEV_DEFCONFIG=${EV3DEV_DEFCONFIG-"bcm2709_defconfig"}
-    export EV3DEV_OBJ=${EV3DEV_OBJ-"${EV3DEV_BUILD_AREA}/linux-ev3dev-rpi2-obj"}
-    export EV3DEV_INSTALL_KERNEL=${EV3DEV_INSTALL_KERNEL-"${EV3DEV_BUILD_AREA}/linux-ev3dev-rpi2-dist"}
-    export EV3DEV_INSTALL_MODULES=${EV3DEV_INSTALL_MODULES-"${EV3DEV_BUILD_AREA}/linux-ev3dev-rpi2-dist"}
-    export EV3DEV_INSTALL_DTBS=${EV3DEV_INSTALL_DTBS-"${EV3DEV_BUILD_AREA}/linux-ev3dev-rpi2-dist/dtbs"}
+    export EV3DEV_OBJ=${EV3DEV_OBJ-${EV3DEV_BUILD_AREA}/linux-ev3dev-rpi2-obj}
+    export EV3DEV_DIST=${EV3DEV_DIST-${EV3DEV_BUILD_AREA}/linux-ev3dev-rpi2-dist}
+    export EV3DEV_INSTALL_KERNEL=${EV3DEV_INSTALL_KERNEL-${EV3DEV_DIST}}
+    export EV3DEV_INSTALL_MODULES=${EV3DEV_INSTALL_MODULES-${EV3DEV_DIST}}
+    export EV3DEV_INSTALL_DTBS=${EV3DEV_INSTALL_DTBS-${EV3DEV_DIST}/dtbs}
+    export EV3DEV_EXTRA_DEFAULT_TARGETS="zImage dtbs"
     export KBUILD_DEBARCH=${KBUILD_DEBARCH-armhf}
 else
-    export EV3DEV_TOOLCHAIN=${EV3DEV_TOOLCHAIN-"/opt/arm-2011.03/bin"}
-    export EV3DEV_ABI=${EV3DEV_ABI-"arm-none-eabi-"}
-    export EV3DEV_BUILD_AREA=${EV3DEV_BUILD_AREA-"$(pwd)/build-area"}
-    export EV3DEV_KERNEL=${EV3DEV_KERNEL-"$(pwd)/../ev3-kernel"}
-    export EV3DEV_DEFCONFIG=${EV3DEV_DEFCONFIG-"ev3dev_defconfig"}
-    export EV3DEV_OBJ=${EV3DEV_OBJ-"${EV3DEV_BUILD_AREA}/linux-ev3dev-ev3-obj"}
-    export EV3DEV_INSTALL_KERNEL=${EV3DEV_INSTALL_KERNEL-"${EV3DEV_BUILD_AREA}/linux-ev3dev-ev3-dist"}
-    export EV3DEV_INSTALL_MODULES=${EV3DEV_INSTALL_MODULES-"${EV3DEV_BUILD_AREA}/linux-ev3dev-ev3-dist"}
+    echo "'$EV3DEV_KERNEL_FLAVOR' is not a known kernel flavor"
+    exit 1
 fi
-
-export EV3DEV_MERGE_CMD=${EV3DEV_MERGE_CMD-"vimdiff \$file1 \$file2"}
-

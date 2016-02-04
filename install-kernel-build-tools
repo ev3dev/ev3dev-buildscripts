@@ -1,9 +1,0 @@
-#!/bin/sh
-# ------------------------------------------------------------------------------
-# install-kernel-build-tools - Downloads and installs the tools required
-#                              to build the kernel.
-# ------------------------------------------------------------------------------
-
-# ------------------------------------------------------------------------------
-# Install required packages
-sudo apt-get --no-install-recommends install build-essential ncurses-dev u-boot-tools libc6-i386 fakeroot bc code-sourcery-toolchain-arm-2011.03

@@ -19,10 +19,11 @@ kernel_install_path="$EV3DEV_INSTALL_KERNEL"
 modules_install_path="$EV3DEV_INSTALL_MODULES"
 dtbs_install_path="$EV3DEV_INSTALL_DTBS"
 make_args="$EV3DEV_MAKE_ARGS -C ${kernel_src_path}
-
-KBUILD_OUTPUT=${obj_path}
-ARCH=arm
-CROSS_COMPILE=$EV3DEV_TOOLCHAIN/$EV3DEV_ABI"
+	KBUILD_OUTPUT=${obj_path}
+	ARCH=arm
+	CROSS_COMPILE=$EV3DEV_TOOLCHAIN/$EV3DEV_ABI"
+extra_default_targets="$EV3DEV_EXTRA_DEFAULT_TARGETS"
+uenv_txt_install_path="$EV3DEV_INSTALL_UENV_TXT"
 
 if [ ! -d "${obj_path}" ]
 then
@@ -39,7 +40,7 @@ fi
 if [ $# -eq 0 ]
 then
 	echo "CROSS COMPILING KERNEL"
-	make ${make_args} uImage modules
+	make ${make_args} ${extra_default_targets} modules
 
 	if [ ! -d "${kernel_install_path}" ]
 	then
@@ -54,12 +55,14 @@ then
 	fi
 
 	echo "COPYING BOOTABLE IMAGE TO INSTALL DIRECTORY"
-	if [ "$RPI" = "1" ]; then
-		mkknlimg ${obj_path}/arch/arm/boot/zImage ${kernel_install_path}/kernel.img
-	elif [ "$RPI" = "2" ]; then
-		mkknlimg ${obj_path}/arch/arm/boot/zImage ${kernel_install_path}/kernel7.img
-	else
+	if [ "$EV3DEV_KERNEL_FLAVOR" = "ev3" ]; then
 		cp ${obj_path}/arch/arm/boot/uImage ${kernel_install_path}
+	elif [ "$EV3DEV_KERNEL_FLAVOR" = "bb.org" ]; then
+		cp ${obj_path}/arch/arm/boot/zImage ${kernel_install_path}
+	elif [ "$EV3DEV_KERNEL_FLAVOR" = "rpi" ]; then
+		mkknlimg ${obj_path}/arch/arm/boot/zImage ${kernel_install_path}/kernel.img
+	elif [ "$EV3DEV_KERNEL_FLAVOR" = "rpi2" ]; then
+		mkknlimg ${obj_path}/arch/arm/boot/zImage ${kernel_install_path}/kernel7.img
 	fi
 
 	echo "COPYING MODULES TO INSTALL DIRECTORY"
@@ -68,6 +71,43 @@ then
 	if [ ! -z ${EV3DEV_INSTALL_DTBS} ]; then
 		echo "COPYING DEVICE TREE BLOCKS TO INSTALL DIRECTORY"
 		make ${make_args} dtbs_install INSTALL_DTBS_PATH=${dtbs_install_path}
+	fi
+
+	if [ "$EV3DEV_KERNEL_FLAVOR" = "bb.org" ]; then
+		echo "COPYING UENV.TXT TO INSTALL DIRECTORY"
+		cat > ${uenv_txt_install_path}/uEnv.txt.new <<EOF
+cape=evb
+
+loadaddr=0x82000000
+fdtaddr=0x88000000
+rdaddr=0x88080000
+
+initrd_high=0xffffffff
+fdt_high=0xffffffff
+
+##These are needed to be compliant with Debian 2014-05-14 u-boot.
+
+loadximage=echo debug: [/zImage] ... ; load mmc 0:1 \${loadaddr} /zImage
+loadxfdt=echo debug: [/dtbs/\${fdtfile}] ... ;load mmc 0:1 \${fdtaddr} /dtbs/\${fdtfile}
+check_dtb=if test -n \${dtb}; then setenv fdtfile \${dtb};fi;
+loadall=run check_dtb; run loadximage; run loadxfdt;
+
+mmcargs=setenv bootargs console=tty0 console=\${console} \${optargs} \${cape_disable} \${cape_enable} root=/dev/mmcblk0p2 rootfstype=\${mmcrootfstype} \${cmdline}
+
+uenvcmd=run loadall; run mmcargs; echo debug: [\${bootargs}] ... ; echo debug: [bootz \${loadaddr} - \${fdtaddr}] ... ; bootz \${loadaddr} - \${fdtaddr};
+EOF
+		if [ -e ${uenv_txt_install_path}/uEnv.txt ]; then
+			if cmp ${uenv_txt_install_path}/uEnv.txt.new ${uenv_txt_install_path}/uEnv.txt --quiet; then
+				# Files are the same, so no need to replace existing file
+				rm ${uenv_txt_install_path}/uEnv.txt.new
+			else
+				# Files are different, so backup and replace existing file
+				mv --backup=existing --suffix=.old ${uenv_txt_install_path}/uEnv.txt.new ${uenv_txt_install_path}/uEnv.txt
+			fi
+		else
+			# File does not exist, so just move
+			mv ${uenv_txt_install_path}/uEnv.txt.new ${uenv_txt_install_path}/uEnv.txt
+		fi
 	fi
 else
 	echo "CROSS COMPILING KERNEL"
