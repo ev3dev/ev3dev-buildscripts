@@ -13,7 +13,7 @@ System Requirements
 * Packages:
 
         # If you haven't already added the ev3dev.org repository...
-        sudo apt-add-repository "deb http://ev3dev.org/debian trusty main"
+        sudo apt-add-repository "deb http://archive.ev3dev.org/ubuntu trusty main"
         sudo apt-key adv --keyserver pgp.mit.edu --recv-keys 2B210565
         sudo apt-get update
         # then install required packages
@@ -27,7 +27,7 @@ System Requirements
 
     * For Raspberry Pi kernel:
 
-            sudo apt-get install rpi-mkimage gcc-linaro-arm-linux-gnueabihf-raspbian
+            sudo apt-get install gcc-arm-rpi-4.9.3-linux-gnueabihf
 
     * For BeagleBone Black kernel:
 
