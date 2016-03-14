@@ -53,8 +53,8 @@ export EV3DEV_BUILD_AREA=${EV3DEV_BUILD_AREA-"$(pwd)/build-area"}
 export EV3DEV_MERGE_CMD=${EV3DEV_MERGE_CMD-"vimdiff \$file1 \$file2"}
 
 if [ "$EV3DEV_KERNEL_FLAVOR" = "ev3" ]; then
-    export EV3DEV_TOOLCHAIN=${EV3DEV_TOOLCHAIN-"/opt/arm-2011.03/bin"}
-    export EV3DEV_ABI=${EV3DEV_ABI-"arm-none-eabi-"}
+    export EV3DEV_TOOLCHAIN=${EV3DEV_TOOLCHAIN-"/usr/lib/x86_64-linux-gnu/gcc-linaro-arm-linux-gnueabihf-5.2/bin"}
+    export EV3DEV_ABI=${EV3DEV_ABI-"arm-linux-gnueabihf-"}
     export EV3DEV_KERNEL=${EV3DEV_KERNEL-"$(pwd)/../ev3-kernel"}
     export EV3DEV_DEFCONFIG=${EV3DEV_DEFCONFIG-"ev3dev_defconfig"}
     export EV3DEV_OBJ=${EV3DEV_OBJ-${EV3DEV_BUILD_AREA}/linux-ev3dev-ev3-obj}

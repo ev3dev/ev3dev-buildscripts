@@ -21,17 +21,13 @@ System Requirements
 
     Plus any of the following that apply...
 
-    * For EV3 kernel:
+    * For EV3 or Beaglebone kernel:
 
-            sudo apt-get install u-boot-tools code-sourcery-toolchain-arm-2011.03
+            sudo apt-get install u-boot-tools lzop gcc-linaro-arm-linux-gnueabihf-5.2
 
     * For Raspberry Pi kernel:
 
             sudo apt-get install gcc-arm-rpi-4.9.3-linux-gnueabihf
-
-    * For BeagleBone Black kernel:
-
-        sudo apt-get install u-boot-tools lzop gcc-linaro-arm-linux-gnueabihf-5.2
 
 Scripts
 -------
