@@ -60,9 +60,9 @@ then
 	elif [ "$EV3DEV_KERNEL_FLAVOR" = "bb.org" ]; then
 		cp ${obj_path}/arch/arm/boot/zImage ${kernel_install_path}
 	elif [ "$EV3DEV_KERNEL_FLAVOR" = "rpi" ]; then
-		${kernel_src_path}/mkknlimg ${obj_path}/arch/arm/boot/zImage ${kernel_install_path}/kernel.img
+		${kernel_src_path}/scripts/mkknlimg ${obj_path}/arch/arm/boot/zImage ${kernel_install_path}/kernel.img
 	elif [ "$EV3DEV_KERNEL_FLAVOR" = "rpi2" ]; then
-		${kernel_src_path}/mkknlimg ${obj_path}/arch/arm/boot/zImage ${kernel_install_path}/kernel7.img
+		${kernel_src_path}/scripts/mkknlimg ${obj_path}/arch/arm/boot/zImage ${kernel_install_path}/kernel7.img
 	fi
 
 	echo "COPYING MODULES TO INSTALL DIRECTORY"
