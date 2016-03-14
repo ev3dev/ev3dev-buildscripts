@@ -89,8 +89,9 @@ fdt_high=0xffffffff
 
 loadximage=echo debug: [/zImage] ... ; load mmc 0:1 \${loadaddr} /zImage
 loadxfdt=echo debug: [/dtbs/\${fdtfile}] ... ;load mmc 0:1 \${fdtaddr} /dtbs/\${fdtfile}
+check_cape=if test -n \${cape}; then setenv fdtfile \${fdtbase}-\${cape}.dtb;fi;
 check_dtb=if test -n \${dtb}; then setenv fdtfile \${dtb};fi;
-loadall=run check_dtb; run loadximage; run loadxfdt;
+loadall=run check_cape; run check_dtb; run loadximage; run loadxfdt;
 
 mmcargs=setenv bootargs console=tty0 console=\${console} \${optargs} \${cape_disable} \${cape_enable} root=/dev/mmcblk0p2 rootfstype=\${mmcrootfstype} \${cmdline}
 
