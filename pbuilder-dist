@@ -192,10 +192,10 @@ class PbuilderDist(object):
         if not self.build_architecture:
             self.build_architecture = self.system_architecture
 
-        if self.build_architecture == self.system_architecture:
-            self.chroot_string = self.target_distro
-        elif self.raspbian:
+        if self.raspbian:
             self.chroot_string = (self.target_distro + '-rpi')
+        elif self.build_architecture == self.system_architecture:
+            self.chroot_string = self.target_distro
         else:
             self.chroot_string = (self.target_distro + '-'
                                   + self.build_architecture)
@@ -343,7 +343,7 @@ class PbuilderDist(object):
             arguments += ['--othermirror', '|'.join(othermirrors)]
 
         # Work around LP:#599695
-        if (self.raspbian):
+        if self.raspbian:
             if not os.path.exists(
                     '/usr/share/keyrings/raspbian-archive-keyring.gpg'):
                 Logger.error('raspbian-keyring not installed')
