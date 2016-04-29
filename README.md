@@ -94,7 +94,7 @@ First time kernel build
         EV3DEV_KERNEL_FLAVOR=bb.org ./build-kernel
 
 6.  That's it! The uImage and kernel modules you just built are saved in
-    `../dist`. You just need to copy the files to your
+    `./build-area`. You just need to copy the files to your
     already formatted SD card. For an easier way of getting the kernel on
     your EV3, see [Sharing Your Kernel](#sharing-your-kernel).
 
