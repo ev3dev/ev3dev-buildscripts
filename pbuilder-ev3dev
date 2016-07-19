@@ -1,0 +1,99 @@
+#!/bin/bash
+#
+# ev3dev-pbuilder - debian package builder for ev3dev
+#
+# Copyright (C) 2016 David Lechner <david@lechnology.com>
+#
+
+set -e
+
+if [ "$OS" == "debian" ]; then
+    MIRRORSITE="http://ftp.debian.org/debian"
+    OTHERMIRROR="deb http://archive.ev3dev.org/debian $DIST main"
+elif [ "$OS" == "raspbian" ]; then
+    MIRRORSITE="http://archive.raspbian.org/raspbian"
+    OTHERMIRROR="deb http://archive.ev3dev.org/raspbian $DIST main"
+elif [ "$OS" == "ubuntu" ]; then
+    MIRRORSITE="http://archive.ubuntu.com/ubuntu"
+    OTHERMIRROR="deb http://archive.ev3dev.org/ubuntu $DIST main"
+else
+    "Echo bad OS"
+    exit 1
+fi
+
+if [ "$TRAVIS" == "true" ]; then
+    # on travis, we cache the result between builds, so it needs to be in a
+    # separate directory
+    BASEDIR="$HOME/cache"
+    RESULTDIR="$HOME/result"
+else
+    BASEDIR="$HOME/pbuilder-ev3dev/$OS"
+    RESULTDIR="$HOME/pbuilder-ev3dev/$OS/$DIST-$ARCH"
+fi
+BASETGZ="$BASEDIR/base-$DIST-$ARCH.tgz"
+
+case $1 in
+
+# Install build depedencies
+deps)
+    sudo apt-add-repository "deb http://archive.ev3dev.org/ubuntu trusty main"
+    sudo apt-key adv --keyserver pgp.mit.edu --recv-keys 2B210565
+    sudo apt-get update
+    if [ "$TRAVIS" != "true" ] || [ "$OS" == "raspbian" ]; then
+        wget --directory-prefix=/tmp http://archive.raspbian.org/raspbian/pool/main/r/raspbian-archive-keyring/raspbian-archive-keyring_20120528.2_all.deb
+        sudo dpkg -i /tmp/raspbian-archive-keyring_20120528.2_all.deb
+    fi
+    sudo apt-get install --yes pbuilder git-buildpackage debhelper qemu-user-static \
+        ubuntu-keyring debian-archive-keyring ev3dev-archive-keyring
+    ;;
+
+# Create/update a pbuilder base image for the specified OS/DIST/ARCH
+base)
+    if [ ! -e "$BASETGZ" ]; then
+        mkdir -p "$BASEDIR"
+        COMMAND="create"
+        echo "Creating $BASETGZ"
+    else
+        COMMAND="update"
+        echo "Updating $BASETGZ"
+    fi
+    if [ "$ARCH" == "armhf" ] || [ "$ARCH" == "armel" ]; then
+        DEBOOTSTRAP="qemu-debootstrap"
+    else
+        DEBOOTSTRAP="debootstrap"
+    fi
+    sudo pbuilder --$COMMAND \
+        --basetgz "$BASETGZ" \
+        --override-config \
+        --distribution "$DIST" \
+        --architecture "$ARCH" \
+        --mirror "$MIRRORSITE" \
+        --othermirror "$OTHERMIRROR" \
+        --debootstrap "$DEBOOTSTRAP" \
+        --debootstrapopts "--keyring=/usr/share/keyrings/$OS-archive-keyring.gpg" \
+        --extrapackages "ca-certificates man-db" \
+        --keyring /usr/share/keyrings/ev3dev-archive-keyring.gpg
+    ;;
+
+build|dev-build)
+    mkdir -p "$RESULTDIR"
+    if [ "$1" == "dev-build" ]; then
+        GBP_OPTIONS="$GBP_OPTIONS --git-ignore-new"
+    fi
+    BUILDER="pbuilder" \
+    PBUILDER_BASE="$BASEDIR" \
+    GIT_PBUILDER_OUTPUT_DIR="$RESULTDIR" \
+    gbp buildpackage \
+        $GBP_OPTIONS \
+        --git-pbuilder \
+        --git-pbuilder-options="--keyring /usr/share/keyrings/ev3dev-archive-keyring.gpg" \
+        --git-dist=$DIST \
+        --git-arch=$ARCH
+    ;;
+
+*)
+    echo "Invalid command."
+    exit 1
+    ;;
+
+esac
