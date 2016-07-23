@@ -189,10 +189,10 @@ Then, we build a Debian package.
     ...
     <lots-of-build-output>
     ...
-    ~/work/ev3dev-buildscripts $ ls ../*.deb
-    ../linux-headers-3.16.7-ckt9-5-ev3dev-your-name-ev3_1_armel.deb
-    ../linux-image-3.16.7-ckt9-5-ev3dev-your-name-ev3_1_armel.deb
-    ../linux-libc-dev_1_armel.deb
+    ~/work/ev3dev-buildscripts $ ls ./build-area/*.deb
+    ./build-area/linux-headers-3.16.7-ckt9-5-ev3dev-your-name-ev3_1_armel.deb
+    ./build-area/linux-image-3.16.7-ckt9-5-ev3dev-your-name-ev3_1_armel.deb
+    ./build-area/linux-libc-dev_1_armel.deb
 
 Now, send the `linux-image-*` file to your friend with these instructions:
 
