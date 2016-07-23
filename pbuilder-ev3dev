@@ -17,7 +17,7 @@ elif [ "$OS" == "ubuntu" ]; then
     MIRRORSITE="http://archive.ubuntu.com/ubuntu"
     OTHERMIRROR="deb http://archive.ev3dev.org/ubuntu $DIST main"
 else
-    "Echo bad OS"
+    echo "Bad OS"
     exit 1
 fi
 
