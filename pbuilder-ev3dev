@@ -99,7 +99,8 @@ build|dev-build)
 dpl)
     PACKAGE=$(dpkg-parsechangelog | grep '^Source:' | cut -b 9-)
     PREFIX=$(echo "$PACKAGE" | ruby -e 'ARGF.read.match /((?:lib)?[0-9a-z])/; puts $1')
-    COMPONENT="main"
+    DEB_COMPONENT=${DEB_COMPONENT:-"main"}
+    DEB_ARCH=${DEB_ARCH:-"$ARCH"}
     cat > $HOME/bintray.json << EOF
 {
   "package": {
@@ -128,8 +129,8 @@ dpl)
               "uploadPattern": "pool/$COMPONENT/$PREFIX/$PACKAGE/\$1",
               "matrixParams": {
                   "deb_distribution": "$DIST",
-                  "deb_component": "$COMPONENT",
-                  "deb_architecture": "$ARCH"
+                  "deb_component": "$DEB_COMPONENT",
+                  "deb_architecture": "$DEB_ARCH"
               }
           }
       ],
