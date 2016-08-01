@@ -126,7 +126,7 @@ dpl)
           {
               "includePattern": "$HOME/result/(.*)",
               "excludePattern": "$HOME/result/.*\.changes",
-              "uploadPattern": "pool/$COMPONENT/$PREFIX/$PACKAGE/\$1",
+              "uploadPattern": "pool/$DEB_COMPONENT/$PREFIX/$PACKAGE/\$1",
               "matrixParams": {
                   "deb_distribution": "$DIST",
                   "deb_component": "$DEB_COMPONENT",
