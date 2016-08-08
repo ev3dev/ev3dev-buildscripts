@@ -98,7 +98,6 @@ build|dev-build)
 # Generate bintray.json for CI deployment
 dpl)
     PACKAGE=$(dpkg-parsechangelog | grep '^Source:' | cut -b 9-)
-    PREFIX=$(echo "$PACKAGE" | ruby -e 'ARGF.read.match /((?:lib)?[0-9a-z])/; puts $1')
     DEB_COMPONENT=${DEB_COMPONENT:-"main"}
     DEB_ARCH=${DEB_ARCH:-"$ARCH"}
     cat > $HOME/bintray.json << EOF
@@ -125,9 +124,9 @@ dpl)
       [
           {
               "includePattern": "$HOME/result/(.*)",
-              "excludePattern": "$HOME/result/.*\.changes",
-              "uploadPattern": "pool/$DEB_COMPONENT/$PREFIX/$PACKAGE/\$1",
+              "uploadPattern": "files/$DIST/$DEB_COMPONENT/$DEB_ARCH/$PACKAGE/\$1",
               "matrixParams": {
+                  "override": 1,
                   "deb_distribution": "$DIST",
                   "deb_component": "$DEB_COMPONENT",
                   "deb_architecture": "$DEB_ARCH"
