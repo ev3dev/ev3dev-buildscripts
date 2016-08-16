@@ -90,7 +90,7 @@ build|dev-build)
     gbp buildpackage \
         $GBP_OPTIONS \
         --git-pbuilder \
-        --git-pbuilder-options="--keyring /usr/share/keyrings/ev3dev-archive-keyring.gpg" \
+        --git-pbuilder-options="--keyring /usr/share/keyrings/ev3dev-archive-keyring.gpg $DEBUILD_OPTIONS" \
         --git-dist=$DIST \
         --git-arch=$ARCH
     ;;
