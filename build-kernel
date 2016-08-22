@@ -76,7 +76,7 @@ then
 	if [ "$EV3DEV_KERNEL_FLAVOR" = "bb.org" ]; then
 		echo "COPYING UENV.TXT TO INSTALL DIRECTORY"
 		cat > ${uenv_txt_install_path}/uEnv.txt.new <<EOF
-cape=evb
+cape=$EV3DEV_CAPE
 
 loadaddr=0x82000000
 fdtaddr=0x88000000

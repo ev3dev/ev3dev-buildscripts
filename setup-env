@@ -75,6 +75,7 @@ elif [ "$EV3DEV_KERNEL_FLAVOR" = "bb.org" ]; then
     export EV3DEV_INSTALL_DTBS=${EV3DEV_INSTALL_DTBS-${EV3DEV_DIST}/dtbs}
     export EV3DEV_EXTRA_DEFAULT_TARGETS="zImage dtbs"
     export KBUILD_DEBARCH=${KBUILD_DEBARCH-armhf}
+    export EV3DEV_CAPE=${EV3DEV_CAPE-evb}
 elif [ "$EV3DEV_KERNEL_FLAVOR" = "rpi" ]; then
     export EV3DEV_TOOLCHAIN=${EV3DEV_TOOLCHAIN-"/usr/lib/x86_64-linux-gnu/gcc-arm-rpi-4.9.3-linux-gnueabihf/bin"}
     export EV3DEV_ABI=${EV3DEV_ABI-"arm-linux-gnueabihf-"}
