@@ -1,0 +1,9 @@
+#!/bin/bash
+
+set -e
+
+BUILDDIR="${BUILDDIR:-/tmp/buildd}"
+
+echo "+++ lintian output +++"
+su -c "lintian -I --show-overrides "$BUILDDIR"/*.changes; :" - pbuilder
+echo "+++ end of lintian output +++"

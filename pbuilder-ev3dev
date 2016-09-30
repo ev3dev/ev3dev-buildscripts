@@ -7,6 +7,9 @@
 
 set -e
 
+script_dir=$(dirname $(readlink -f $0))
+hook_dir=$script_dir/pbuilder-ev3dev-hooks
+
 if [ "$OS" == "debian" ]; then
     MIRRORSITE="http://ftp.debian.org/debian"
     COMPONENTS="main"
@@ -75,8 +78,9 @@ base)
         --components "$COMPONENTS" \
         --othermirror "$OTHERMIRROR" \
         --debootstrap "$DEBOOTSTRAP" \
+        --hookdir "" \
         --debootstrapopts "--keyring=/usr/share/keyrings/$OS-archive-keyring.gpg" \
-        --extrapackages "ca-certificates man-db" \
+        --extrapackages "ca-certificates man-db debhelper lintian" \
         --keyring /usr/share/keyrings/ev3dev-archive-keyring.gpg
     ;;
 
@@ -91,7 +95,7 @@ build|dev-build)
     gbp buildpackage \
         $GBP_OPTIONS \
         --git-pbuilder \
-        --git-pbuilder-options="--keyring /usr/share/keyrings/ev3dev-archive-keyring.gpg $DEBUILD_OPTIONS" \
+        --git-pbuilder-options="--keyring /usr/share/keyrings/ev3dev-archive-keyring.gpg --hookdir $hook_dir $DEBUILD_OPTIONS" \
         --git-dist=$DIST \
         --git-arch=$ARCH
     ;;
