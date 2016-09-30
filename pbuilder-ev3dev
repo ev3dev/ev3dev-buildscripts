@@ -45,6 +45,7 @@ deps)
     if [ "$TRAVIS" != "true" ] || [ "$OS" == "raspbian" ]; then
         wget --directory-prefix=/tmp http://archive.raspbian.org/raspbian/pool/main/r/raspbian-archive-keyring/raspbian-archive-keyring_20120528.2_all.deb
         sudo dpkg -i /tmp/raspbian-archive-keyring_20120528.2_all.deb
+        rm /tmp/raspbian-archive-keyring_20120528.2_all.deb
     fi
     sudo apt-get install --yes pbuilder git-buildpackage debhelper qemu-user-static \
         ubuntu-keyring debian-archive-keyring ev3dev-archive-keyring
