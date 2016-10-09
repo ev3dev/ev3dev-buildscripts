@@ -29,6 +29,7 @@ System Requirements
 
             sudo apt-get install gcc-arm-rpi-4.9.3-linux-gnueabihf
 
+
 Scripts
 -------
 
@@ -39,11 +40,6 @@ Scripts
 
 `menuconfig`                 Runs the menu configuration tool for the
                              kernel configuration.
-
-`pbuilder-dist`              Modified version of `pbuilder-dist` from
-                             `ubuntu-dev-tools` package. Allow you to specify
-                             architecture of `rpi` to build packages for
-                             Raspbian (amrv6).
 
 
 First time kernel build
@@ -71,8 +67,8 @@ First time kernel build
 
         ~/work $ cd ev3dev-buildscripts
         ~/work/ev3dev-buildscripts $ ls
-        boot.cmd        build-kernel  local-env  menuconfig     README.md
-        build-boot-scr  defconfig     LICENSE    pbuilder-dist  setup-env
+        boot.cmd        build-kernel  LICENSE    menuconfig  setup-env
+        build-boot-scr  defconfig     local-env  README.md
 
 4.  Create a `local-env` to make use of all of your processing power. See the
     [Faster Builds and Custom Locations](#faster-builds-and-custom-locations)
