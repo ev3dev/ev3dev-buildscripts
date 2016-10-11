@@ -78,6 +78,8 @@ then
 		cat > ${uenv_txt_install_path}/uEnv.txt.new <<EOF
 cape=$EV3DEV_CAPE
 
+cmdline=splash console=tty1
+
 loadaddr=0x82000000
 fdtaddr=0x88000000
 rdaddr=0x88080000
