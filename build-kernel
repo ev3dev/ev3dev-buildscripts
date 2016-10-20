@@ -56,6 +56,11 @@ then
 
 	echo "COPYING BOOTABLE IMAGE TO INSTALL DIRECTORY"
 	if [ "$EV3DEV_KERNEL_FLAVOR" = "ev3" ]; then
+		if [ -n "$EV3DEV_APPEND_DTB" ]; then
+			cat ${obj_path}/arch/arm/boot/zImage ${obj_path}/arch/arm/boot/dts/$EV3DEV_APPEND_DTB > ${obj_path}/arch/arm/boot/zImage+dtb
+			mkimage -A arm -O linux -T kernel -C none -a 0xC0008000 -e 0xC0008000 \
+				-n kernel -d ${obj_path}/arch/arm/boot/zImage+dtb ${obj_path}/arch/arm/boot/uImage
+		fi
 		cp ${obj_path}/arch/arm/boot/uImage ${kernel_install_path}
 	elif [ "$EV3DEV_KERNEL_FLAVOR" = "bb.org" ]; then
 		cp ${obj_path}/arch/arm/boot/zImage ${kernel_install_path}

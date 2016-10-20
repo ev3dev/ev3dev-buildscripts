@@ -19,6 +19,7 @@
 # EV3DEV_INSTALL_KERNEL: Where the kernel uImage will be installed.
 # EV3DEV_INSTALL_MODULES: Where the kernel modules will be installed.
 # EV3DEV_INSTALL_DTBS: Where the device tree blocks will be installed.
+# EV3DEV_APPEND_DTB: Name of the .dtb file to append to the kernel image.
 # EV3DEV_INSTALL_UENV_TXT: Where the uEnv.txt file is installed (BeagleBoard only).
 # EV3DEV_TOOLCHAIN: Where to find the cross-compiler toolchain.
 # EV3DEV_MERGE_CMD: The command that the defconfig script uses to merge files.
@@ -61,7 +62,11 @@ if [ "$EV3DEV_KERNEL_FLAVOR" = "ev3" ]; then
     export EV3DEV_DIST=${EV3DEV_DIST-${EV3DEV_BUILD_AREA}/linux-ev3dev-ev3-dist}
     export EV3DEV_INSTALL_KERNEL=${EV3DEV_INSTALL_KERNEL-${EV3DEV_DIST}}
     export EV3DEV_INSTALL_MODULES=${EV3DEV_INSTALL_MODULES-${EV3DEV_DIST}}
-    export EV3DEV_EXTRA_DEFAULT_TARGETS=uImage
+    if [ -n "$EV3DEV_APPEND_DTB" ]; then
+        export EV3DEV_EXTRA_DEFAULT_TARGETS="zImage dtbs"
+    else
+        export EV3DEV_EXTRA_DEFAULT_TARGETS=uImage
+    fi
 elif [ "$EV3DEV_KERNEL_FLAVOR" = "bb.org" ]; then
     export EV3DEV_TOOLCHAIN=${EV3DEV_TOOLCHAIN-"/usr/lib/x86_64-linux-gnu/gcc-linaro-arm-linux-gnueabihf-5.2/bin"}
     export EV3DEV_ABI=${EV3DEV_ABI-"arm-linux-gnueabihf-"}
