@@ -57,8 +57,8 @@ First time kernel build
     update the submodule commit in the kernel repo, so you have to pull manually
     to get the most recent commits).
 
-        ~/work $ git clone git://github.com/ev3dev/ev3dev-buildscripts
-        ~/work $ git clone --recursive git://github.com/ev3dev/ev3-kernel
+        ~/work $ git clone git://github.com/ev3dev/ev3dev-buildscripts --branch ev3dev-jessie
+        ~/work $ git clone --recursive git://github.com/ev3dev/ev3-kernel --branch ev3dev-jessie
         ~/work $ cd ev3-kernel/drivers/lego
         ~/work/ev3-kernel/drivers/lego $ git pull origin master
         ~/work/ev3-kernel/drivers/lego $ cd ../../..
