@@ -5,6 +5,10 @@ These are the scripts used to compile the ev3dev kernel. Originally it also
 included scripts to bootstrap a root file system and create a disk image.
 Those scripts have evolved into the [brickstrap] package.
 
+**NOTE:** The instructions below are for ev3dev-stretch. If you want to build
+a kernel for ev3dev-jessie, please use the [ev3dev-jessie branch].
+
+[ev3dev-jessie branch]: https://github.com/ev3dev/ev3dev-buildscripts/tree/ev3dev-jessie
 
 System Requirements
 -------------------
