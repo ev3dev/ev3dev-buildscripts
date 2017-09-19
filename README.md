@@ -17,15 +17,15 @@ System Requirements
         sudo apt-key adv --keyserver pgp.mit.edu --recv-keys 2B210565
         sudo apt-get update
         # then install required packages
-        sudo apt-get install git build-essential ncurses-dev fakeroot bc gcc-linaro-arm-linux-gnueabihf-5.2 u-boot-tools
+        sudo apt-get install git build-essential ncurses-dev fakeroot bc
 
-    Plus any of the following that apply...
+    **Plus any of the following that apply...**
 
-    * For EV3 or Beaglebone kernel:
+    * For **EV3** or **Beaglebone** kernel:
 
             sudo apt-get install u-boot-tools lzop gcc-linaro-arm-linux-gnueabihf-5.2
 
-    * For Raspberry Pi kernel:
+    * For **Raspberry Pi** kernel:
 
             sudo apt-get install gcc-arm-rpi-4.9.3-linux-gnueabihf
 
