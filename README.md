@@ -17,7 +17,7 @@ System Requirements
         sudo apt-key adv --keyserver pgp.mit.edu --recv-keys 2B210565
         sudo apt-get update
         # then install required packages
-        sudo apt-get install git build-essential ncurses-dev fakeroot bc
+        sudo apt-get install git build-essential ncurses-dev fakeroot bc gcc-linaro-arm-linux-gnueabihf-5.2 u-boot-tools
 
     Plus any of the following that apply...
 
@@ -55,12 +55,14 @@ First time kernel build
 2.  Clone this repo and also the ev3-kernel repo (or rpi-kernel or bb.org-kernel),
     then make sure the lego drivers submodule is up to date (we don't always
     update the submodule commit in the kernel repo, so you have to pull manually
-    to get the most recent commits).
+    to get the most recent commits). Note that we only clone the recent history of
+    the repository to save time; if you need more than 50 commits, remove the
+    `--depth` option.
 
         ~/work $ git clone git://github.com/ev3dev/ev3dev-buildscripts --branch ev3dev-jessie
-        ~/work $ git clone --recursive git://github.com/ev3dev/ev3-kernel --branch ev3dev-jessie
+        ~/work $ git clone --recursive git://github.com/ev3dev/ev3-kernel --branch ev3dev-jessie --depth 50
         ~/work $ cd ev3-kernel/drivers/lego
-        ~/work/ev3-kernel/drivers/lego $ git pull origin master
+        ~/work/ev3-kernel/drivers/lego $ git pull origin ev3dev-jessie
         ~/work/ev3-kernel/drivers/lego $ cd ../../..
 
 3.  Change to the `ev3dev-buildscripts` directory and have a look around.
