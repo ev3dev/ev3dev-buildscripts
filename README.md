@@ -8,7 +8,7 @@ Those scripts have evolved into the [brickstrap] package.
 
 System Requirements
 -------------------
-* Debian or derivative OS (Ubuntu, Mint, etc.)
+* Debian or derivative OS (Ubuntu, Mint, etc.) *OR* a Windows 10 PC [with the Windows Subsystem for Linux enabled](https://msdn.microsoft.com/en-us/commandline/wsl/install_guide).
 * User account with `sudo` enabled
 * Packages:
 
