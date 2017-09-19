@@ -12,7 +12,8 @@ a kernel for ev3dev-jessie, please use the [ev3dev-jessie branch].
 
 System Requirements
 -------------------
-* Debian or derivative OS (Ubuntu, Mint, etc.)
+* Debian or derivative OS (Ubuntu, Mint, etc. - can be run in a [virtual machine](https://www.virtualbox.org/)
+  or with [Windows Subsystem for Linux](https://msdn.microsoft.com/en-us/commandline/wsl/install_guide))
 * User account with `sudo` enabled
 * Packages:
 
