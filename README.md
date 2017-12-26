@@ -12,27 +12,17 @@ a kernel for ev3dev-jessie, please use the [ev3dev-jessie branch].
 
 System Requirements
 -------------------
-* Debian or derivative OS (Ubuntu, Mint, etc. - can be run in a [virtual machine](https://www.virtualbox.org/)
+* Ubuntu LTS (can be run in a [virtual machine](https://www.virtualbox.org/)
   or with [Windows Subsystem for Linux](https://msdn.microsoft.com/en-us/commandline/wsl/install_guide))
 * User account with `sudo` enabled
 * Packages:
 
         # If you haven't already added the ev3dev.org repository...
-        sudo apt-add-repository "deb http://archive.ev3dev.org/ubuntu trusty main"
-        sudo apt-key adv --keyserver pgp.mit.edu --recv-keys 2B210565
+        sudo apt-add-repository ppa:ev3dev/tools
         sudo apt-get update
         # then install required packages
-        sudo apt-get install git build-essential ncurses-dev fakeroot bc
-
-    **Plus any of the following that apply...**
-
-    * For **EV3** or **Beaglebone** kernel:
-
-            sudo apt-get install u-boot-tools lzop gcc-linaro-arm-linux-gnueabihf-5.2
-
-    * For **Raspberry Pi** kernel:
-
-            sudo apt-get install gcc-arm-rpi-4.9.3-linux-gnueabihf
+        sudo apt-get install git build-essential ncurses-dev fakeroot bc \
+        u-boot-tools lzop gcc-linaro-arm-linux-gnueabihf-6.4
 
 
 Scripts
