@@ -78,6 +78,11 @@ then
 		make ${make_args} dtbs_install INSTALL_DTBS_PATH=${dtbs_install_path}
 	fi
 
+	if [ ! -z ${EV3DEV_COPY_DTB} ]; then
+		echo "COPYING DEVICE TREE TO KERNEL INSTALL DIRECTORY"
+		cp ${dtbs_install_path}/${EV3DEV_COPY_DTB} ${kernel_install_path}/${EV3DEV_COPY_DTB}
+	fi
+
 	if [ "$EV3DEV_KERNEL_FLAVOR" = "bb.org" ]; then
 		echo "COPYING UENV.TXT TO INSTALL DIRECTORY"
 		cat > ${uenv_txt_install_path}/uEnv.txt.new <<EOF

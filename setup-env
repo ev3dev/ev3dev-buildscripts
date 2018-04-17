@@ -30,6 +30,7 @@
 # EV3DEV_DIST: The directory where the kernel files will be installed.
 # EV3DEV_DEFCONFIG: The default configuration to use when building the kernel.
 # EV3DEV_APPEND_DTB: Name of the .dtb file to append to the kernel image.
+# EV3DEV_COPY_DTB: Name of a .dtb file to copy from $EV3DEV_INSTALL_DTBS to $EV3DEV_INSTALL_KERNEL,
 # EV3DEV_EXTRA_DEFAULT_TARGETS: Extra make targets that are run by ./build-kernel
 #
 # This file is normally sourced from within the actual build script using:
