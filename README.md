@@ -87,7 +87,10 @@ First time kernel build
 6.  That's it! The uImage and kernel modules you just built are saved in
     `./build-area`. You just need to copy the files to your
     already formatted SD card. For an easier way of getting the kernel on
-    your EV3, see [Sharing Your Kernel](#sharing-your-kernel).
+    your EV3, see [Sharing Your Kernel](#sharing-your-kernel). Starting with
+    ev3dev-stretch images dated 2018-05 or later, the uImage file is no longer
+    used. Create a Debian package as described in the *Sharing Your Kernel*
+    section.
 
         ~/work/ev3dev-buildscripts $ cd ./build-area/linux-ev3dev-ev3-dist
         ~/work/ev3dev-buildscripts/build-area/linux-ev3dev-ev3-dist $ cp uImage <path-to-boot-partition>/uImage
