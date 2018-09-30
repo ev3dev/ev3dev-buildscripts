@@ -179,7 +179,7 @@ It is also important that the kernel release ends with `-ev3` so that
 
 Then, we build a Debian package.
 
-    ~/work/ev3dev-buildscripts $ ./build-kernel deb-pkg KDEB_PKGVERSION=1
+    ~/work/ev3dev-buildscripts $ ./build-kernel bindeb-pkg KDEB_PKGVERSION=1
     ...
     <lots-of-build-output>
     ...
