@@ -22,7 +22,8 @@ System Requirements
         sudo apt-get update
         # then install required packages
         sudo apt-get install git build-essential ncurses-dev fakeroot bc \
-        u-boot-tools lzop gcc-linaro-arm-linux-gnueabihf-6.4
+        u-boot-tools lzop flex bison libssl-dev \
+        gcc-linaro-arm-linux-gnueabihf-6.4
 
 
 Scripts
