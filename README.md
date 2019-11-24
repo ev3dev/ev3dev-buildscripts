@@ -5,10 +5,10 @@ These are the scripts used to compile the ev3dev kernel. Originally it also
 included scripts to bootstrap a root file system and create a disk image.
 Those scripts have evolved into the [brickstrap] package.
 
-**NOTE:** The instructions below are for ev3dev-stretch. If you want to build
-a kernel for ev3dev-jessie, please use the [ev3dev-jessie branch].
+**NOTE:** The instructions below are for ev3dev-buster. If you want to build
+a kernel for ev3dev-stretch, please use the [ev3dev-stretch branch].
 
-[ev3dev-jessie branch]: https://github.com/ev3dev/ev3dev-buildscripts/tree/ev3dev-jessie
+[ev3dev-stretch branch]: https://github.com/ev3dev/ev3dev-buildscripts/tree/ev3dev-stretch
 
 System Requirements
 -------------------
@@ -22,8 +22,7 @@ System Requirements
         sudo apt-get update
         # then install required packages
         sudo apt-get install git build-essential ncurses-dev fakeroot bc \
-        u-boot-tools lzop flex bison libssl-dev \
-        gcc-linaro-arm-linux-gnueabihf-6.4
+        u-boot-tools lzop flex bison libssl-dev gcc-arm-linux-gnueabihf-8.3
 
 
 Scripts
@@ -56,7 +55,7 @@ First time kernel build
         ~/work $ git clone git://github.com/ev3dev/ev3dev-buildscripts
         ~/work $ git clone --recursive --depth 150 git://github.com/ev3dev/ev3-kernel
         ~/work $ cd ev3-kernel/drivers/lego
-        ~/work/ev3-kernel/drivers/lego $ git pull origin ev3dev-stretch
+        ~/work/ev3-kernel/drivers/lego $ git pull origin ev3dev-buster
         ~/work/ev3-kernel/drivers/lego $ cd -
 
 3.  Change to the `ev3dev-buildscripts` directory and have a look around.
@@ -85,17 +84,12 @@ First time kernel build
         # BeagleBoard
         EV3DEV_KERNEL_FLAVOR=bb.org ./build-kernel
 
-6.  That's it! The uImage and kernel modules you just built are saved in
-    `./build-area`. You just need to copy the files to your
-    already formatted SD card. For an easier way of getting the kernel on
-    your EV3, see [Sharing Your Kernel](#sharing-your-kernel). Starting with
-    ev3dev-stretch images dated 2018-05 or later, the uImage file is no longer
-    used. Create a Debian package as described in the *Sharing Your Kernel*
-    section.
+6.  That's it!  
 
-        ~/work/ev3dev-buildscripts $ cd ./build-area/linux-ev3dev-ev3-dist
-        ~/work/ev3dev-buildscripts/build-area/linux-ev3dev-ev3-dist $ cp uImage <path-to-boot-partition>/uImage
-        ~/work/ev3dev-buildscripts/build-area/linux-ev3dev-ev3-dist $ sudo cp -r lib/ <path-to-file-system-partition>
+    TODO: add instructions on how to modify uEnv.txt to use uImage file.
+ 
+    For now, see [Sharing Your Kernel](#sharing-your-kernel) for how to create
+    a debian package to install the kernel you just built.
 
 
 Faster Builds and Custom Locations
