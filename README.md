@@ -23,7 +23,7 @@ System Requirements
         # then install required packages
         sudo apt-get install git build-essential ncurses-dev fakeroot bc \
         u-boot-tools lzop flex bison libssl-dev \
-        gcc-linaro-arm-linux-gnueabihf-6.4
+        gcc-linaro-arm-linux-gnueabihf-6.4 gcc-arm-linux-gnueabihf-8.3
 
 
 Scripts
@@ -56,6 +56,7 @@ First time kernel build
         ~/work $ git clone git://github.com/ev3dev/ev3dev-buildscripts
         ~/work $ git clone --recursive --depth 150 git://github.com/ev3dev/ev3-kernel
         ~/work $ cd ev3-kernel/drivers/lego
+        ~/work/ev3-kernel/drivers/lego $ git checkout ev3dev-stretch
         ~/work/ev3-kernel/drivers/lego $ git pull origin ev3dev-stretch
         ~/work/ev3-kernel/drivers/lego $ cd -
 
