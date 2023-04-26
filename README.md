@@ -17,13 +17,10 @@ System Requirements
 * User account with `sudo` enabled
 * Packages:
 
-        # If you haven't already added the ev3dev.org repository...
-        sudo apt-add-repository ppa:ev3dev/tools
         sudo apt-get update
         # then install required packages
         sudo apt-get install git build-essential ncurses-dev fakeroot bc \
-        u-boot-tools lzop flex bison libssl-dev \
-        gcc-linaro-arm-linux-gnueabihf-6.4
+        u-boot-tools lzop flex bison libssl-dev gcc-arm-linux-gnueabi
 
 
 Scripts
@@ -53,11 +50,9 @@ First time kernel build
     update the submodule commit in the kernel repo, so you have to pull manually
     to get the most recent commits).
 
-        ~/work $ git clone git://github.com/ev3dev/ev3dev-buildscripts
-        ~/work $ git clone --recursive --depth 150 git://github.com/ev3dev/ev3-kernel
-        ~/work $ cd ev3-kernel/drivers/lego
-        ~/work/ev3-kernel/drivers/lego $ git pull origin ev3dev-stretch
-        ~/work/ev3-kernel/drivers/lego $ cd -
+        ~/work $ git clone https://github.com/ev3dev/ev3dev-buildscripts --branch ev3dev-stretch
+        ~/work $ git clone --recursive --depth 150 https://github.com/ev3dev/ev3-kernel \
+        --branch ev3dev-stretch
 
 3.  Change to the `ev3dev-buildscripts` directory and have a look around.
 
