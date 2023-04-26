@@ -21,7 +21,7 @@ dtbs_install_path="$EV3DEV_INSTALL_DTBS"
 make_args="$EV3DEV_MAKE_ARGS -C ${kernel_src_path}
 	KBUILD_OUTPUT=${obj_path}
 	ARCH=arm
-	CROSS_COMPILE=$EV3DEV_TOOLCHAIN/$EV3DEV_ABI"
+	CROSS_COMPILE=${EV3DEV_TOOLCHAIN}${EV3DEV_ABI}"
 extra_default_targets="$EV3DEV_EXTRA_DEFAULT_TARGETS"
 uenv_txt_install_path="$EV3DEV_INSTALL_UENV_TXT"
 
