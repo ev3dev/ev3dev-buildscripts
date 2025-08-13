@@ -50,9 +50,8 @@ First time kernel build
     update the submodule commit in the kernel repo, so you have to pull manually
     to get the most recent commits).
 
-        ~/work $ git clone https://github.com/ev3dev/ev3dev-buildscripts --branch ev3dev-stretch
-        ~/work $ git clone --recursive --depth 150 https://github.com/ev3dev/ev3-kernel \
-        --branch ev3dev-stretch
+        ~/work $ git clone https://github.com/project516/ev3dev-buildscripts
+        ~/work $ git clone --recursive --depth 25 https://github.com/project516/ev3-kernel
 
 3.  Change to the `ev3dev-buildscripts` directory and have a look around.
 
