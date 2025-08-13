@@ -5,7 +5,7 @@ These are the scripts used to compile the ev3dev kernel. Originally it also
 included scripts to bootstrap a root file system and create a disk image.
 Those scripts have evolved into the [brickstrap] package.
 
-**NOTE:** The instructions below are for ev3dev-buster. If you want to build
+**NOTE:** The instructions below are for ev3dev-trixie. If you want to build
 a kernel for ev3dev-stretch, please use the [ev3dev-stretch branch].
 
 [ev3dev-stretch branch]: https://github.com/ev3dev/ev3dev-buildscripts/tree/ev3dev-stretch
@@ -13,7 +13,7 @@ a kernel for ev3dev-stretch, please use the [ev3dev-stretch branch].
 System Requirements
 -------------------
 * Ubuntu LTS (can be run in a [virtual machine](https://www.virtualbox.org/)
-  or with [Windows Subsystem for Linux](https://msdn.microsoft.com/en-us/commandline/wsl/install_guide))
+  or with [Windows Subsystem for Linux](https://learn.microsoft.com/en-us/windows/wsl/install))
 * User account with `sudo` enabled
 * Packages:
 
