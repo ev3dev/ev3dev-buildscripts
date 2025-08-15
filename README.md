@@ -20,7 +20,7 @@ System Requirements
         sudo apt-get update
         # then install required packages
         sudo apt-get install git build-essential ncurses-dev fakeroot bc \
-        u-boot-tools lzop flex bison libssl-dev gcc-arm-linux-gnueabi
+        u-boot-tools lzop flex bison libssl-dev gcc-arm-linux-gnueabi gcc-arm-linux-gnueabihf
 
 
 Scripts
@@ -51,7 +51,7 @@ First time kernel build
     to get the most recent commits).
 
         ~/work $ git clone https://github.com/project516/ev3dev-buildscripts
-        ~/work $ git clone --recursive --depth 25 https://github.com/project516/ev3-kernel
+        ~/work $ git clone --recursive --depth 25 https://github.com/project516/ev3-kernel 
 
 3.  Change to the `ev3dev-buildscripts` directory and have a look around.
 
