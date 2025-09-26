@@ -79,14 +79,19 @@ First time kernel build
         # BeagleBoard
         EV3DEV_KERNEL_FLAVOR=bb.org ./build-kernel
 
-6.  That's it!  
+6.  That's it! The uImage and kernel modules you just built are saved in
+    `./build-area`. You just need to copy the files to your
+    already formatted SD card. For an easier way of getting the kernel on
+    your EV3, see [Sharing Your Kernel](#sharing-your-kernel). Starting with
+    ev3dev-stretch images dated 2018-05 or later, the uImage file is no longer
+    used. Create a Debian package as described in the *Sharing Your Kernel*
+    section.
 
-    TODO: add instructions on how to modify uEnv.txt to use uImage file.
- 
-    For now, see [Sharing Your Kernel](#sharing-your-kernel) for how to create
-    a debian package to install the kernel you just built.
+        ~/work/ev3dev-buildscripts $ cd ./build-area/linux-ev3dev-ev3-dist
+        ~/work/ev3dev-buildscripts/build-area/linux-ev3dev-ev3-dist $ cp uImage <path-to-boot-partition>/uImage
+        ~/work/ev3dev-buildscripts/build-area/linux-ev3dev-ev3-dist $ sudo cp -r lib/ <path-to-file-system-partition>
 
-
+    
 Faster Builds and Custom Locations
 ----------------------------------
 
