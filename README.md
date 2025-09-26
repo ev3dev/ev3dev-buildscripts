@@ -20,7 +20,7 @@ System Requirements
         sudo apt-get update
         # then install required packages
         sudo apt-get install git build-essential ncurses-dev fakeroot bc \
-        u-boot-tools lzop flex bison libssl-dev gcc-arm-linux-gnueabi gcc-arm-linux-gnueabihf
+        u-boot-tools lzop flex bison libssl-dev gcc-arm-linux-gnueabi gcc-arm-linux-gnueabihf -y
 
 
 Scripts
