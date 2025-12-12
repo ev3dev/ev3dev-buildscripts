@@ -233,6 +233,5 @@ Rebasing
 ```bash
 git remote add kernel https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git
 git fetch kernel tag v6.12.y
-git checkout bookworm
 git rebase v6.12.y
 ```
