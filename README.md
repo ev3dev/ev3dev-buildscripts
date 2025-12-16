@@ -20,7 +20,7 @@ System Requirements
         sudo apt-get update
         # then install required packages
         sudo apt-get install git build-essential ncurses-dev fakeroot bc \
-        u-boot-tools lzop flex bison libssl-dev gcc-arm-linux-gnueabi gcc-arm-linux-gnueabihf -y
+        u-boot-tools lzop flex bison libssl-dev gcc-arm-linux-gnueabi
 
 
 Scripts
@@ -50,8 +50,8 @@ First time kernel build
     update the submodule commit in the kernel repo, so you have to pull manually
     to get the most recent commits).
 
-        ~/work $ git clone https://github.com/project516/ev3dev-buildscripts
-        ~/work $ git clone --recursive --depth 25 https://github.com/project516/ev3-kernel 
+        ~/work $ git clone https://github.com/ev3dev/ev3dev-buildscripts
+        ~/work $ git clone --recursive --depth 25 -b ev3dev-trixie https://github.com/ev3dev/ev3-kernel 
 
 3.  Change to the `ev3dev-buildscripts` directory and have a look around.
 
@@ -161,6 +161,12 @@ Sharing Your Kernel
 Want to send your custom kernel to someone so that they can use it? Never fear,
 there is an easy way to do that - using Debian packaging.
 
+Make sure to install debhelper with:
+
+```bash
+sudo apt-get install debhelper
+```
+
 First, we want to set a kernel option so that our friends will know what kernel
 they are running. Run `./menuconfig` and set this option:
 
@@ -230,8 +236,19 @@ Common Errors
 Rebasing
 --------
 
+If you want to update your kernel, rebase!
+
 ```bash
-git remote add kernel https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git
-git fetch kernel tag v6.12.y
+git remote add stable https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git
+git fetch stable tag v6.12.y # with 'y' being the latest version 
 git rebase v6.12.y
+```
+
+Updating Submodules
+-------------------
+
+If you want to update the submodules in the ev3-kernel (or you forgot to initialize them):
+
+```bash
+git submodule update --init --recursive --remote
 ```
