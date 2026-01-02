@@ -5,7 +5,7 @@ These are the scripts used to compile the ev3dev kernel. Originally it also
 included scripts to bootstrap a root file system and create a disk image.
 Those scripts have evolved into the [brickstrap] package.
 
-**NOTE:** The instructions below are for ev3dev-buster. If you want to build
+**NOTE:** The instructions below are for ev3dev-trixie. If you want to build
 a kernel for ev3dev-stretch, please use the [ev3dev-stretch branch].
 
 [ev3dev-stretch branch]: https://github.com/ev3dev/ev3dev-buildscripts/tree/ev3dev-stretch
@@ -13,16 +13,14 @@ a kernel for ev3dev-stretch, please use the [ev3dev-stretch branch].
 System Requirements
 -------------------
 * Ubuntu LTS (can be run in a [virtual machine](https://www.virtualbox.org/)
-  or with [Windows Subsystem for Linux](https://msdn.microsoft.com/en-us/commandline/wsl/install_guide))
+  or with [Windows Subsystem for Linux](https://learn.microsoft.com/en-us/windows/wsl/install))
 * User account with `sudo` enabled
 * Packages:
 
-        # If you haven't already added the ev3dev.org repository...
-        sudo apt-add-repository ppa:ev3dev/tools
         sudo apt-get update
         # then install required packages
         sudo apt-get install git build-essential ncurses-dev fakeroot bc \
-        u-boot-tools lzop flex bison libssl-dev gcc-arm-linux-gnueabihf-8.3
+        u-boot-tools lzop flex bison libssl-dev gcc-arm-linux-gnueabi
 
 
 Scripts
@@ -52,11 +50,8 @@ First time kernel build
     update the submodule commit in the kernel repo, so you have to pull manually
     to get the most recent commits).
 
-        ~/work $ git clone git://github.com/ev3dev/ev3dev-buildscripts
-        ~/work $ git clone --recursive --depth 150 git://github.com/ev3dev/ev3-kernel
-        ~/work $ cd ev3-kernel/drivers/lego
-        ~/work/ev3-kernel/drivers/lego $ git pull origin ev3dev-buster
-        ~/work/ev3-kernel/drivers/lego $ cd -
+        ~/work $ git clone https://github.com/ev3dev/ev3dev-buildscripts
+        ~/work $ git clone --recursive --depth 25 -b ev3dev-trixie https://github.com/ev3dev/ev3-kernel 
 
 3.  Change to the `ev3dev-buildscripts` directory and have a look around.
 
@@ -84,14 +79,19 @@ First time kernel build
         # BeagleBoard
         EV3DEV_KERNEL_FLAVOR=bb.org ./build-kernel
 
-6.  That's it!  
+6.  That's it! The uImage and kernel modules you just built are saved in
+    `./build-area`. You just need to copy the files to your
+    already formatted SD card. For an easier way of getting the kernel on
+    your EV3, see [Sharing Your Kernel](#sharing-your-kernel). Starting with
+    ev3dev-stretch images dated 2018-05 or later, the uImage file is no longer
+    used. Create a Debian package as described in the *Sharing Your Kernel*
+    section.
 
-    TODO: add instructions on how to modify uEnv.txt to use uImage file.
- 
-    For now, see [Sharing Your Kernel](#sharing-your-kernel) for how to create
-    a debian package to install the kernel you just built.
+        ~/work/ev3dev-buildscripts $ cd ./build-area/linux-ev3dev-ev3-dist
+        ~/work/ev3dev-buildscripts/build-area/linux-ev3dev-ev3-dist $ cp uImage <path-to-boot-partition>/uImage
+        ~/work/ev3dev-buildscripts/build-area/linux-ev3dev-ev3-dist $ sudo cp -r lib/ <path-to-file-system-partition>
 
-
+    
 Faster Builds and Custom Locations
 ----------------------------------
 
@@ -161,6 +161,12 @@ Sharing Your Kernel
 Want to send your custom kernel to someone so that they can use it? Never fear,
 there is an easy way to do that - using Debian packaging.
 
+Make sure to install debhelper with:
+
+```bash
+sudo apt-get install debhelper
+```
+
 First, we want to set a kernel option so that our friends will know what kernel
 they are running. Run `./menuconfig` and set this option:
 
@@ -226,3 +232,23 @@ Common Errors
 
 [brickstrap]: https://github.com/ev3dev/brickstrap
 [wiki]: https://github.com/ev3dev/ev3dev/wiki
+
+Rebasing
+--------
+
+If you want to update your kernel, rebase!
+
+```bash
+git remote add stable https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git
+git fetch stable tag v6.12.y # with 'y' being the latest version 
+git rebase v6.12.y
+```
+
+Updating Submodules
+-------------------
+
+If you want to update the submodules in the ev3-kernel (or you forgot to initialize them):
+
+```bash
+git submodule update --init --recursive --remote
+```
